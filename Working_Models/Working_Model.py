@@ -115,7 +115,7 @@ def working_model():
     
     # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
-        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5),
+        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5) + pd.Timedelta(days = 1),
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,
@@ -129,5 +129,3 @@ def working_model():
     filename = f'energy_predictions_{today_date}.csv'
     # Save DataFrame to CSV
     output_df.to_csv(filename, index=False)
-
-working_model()

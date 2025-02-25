@@ -99,6 +99,3 @@ def hydro_main():
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Percent Error (PERR): {percent_error}\n')
 
     model.save('Working_Models/HydroModel.h5')
-
-
-hydro_main()

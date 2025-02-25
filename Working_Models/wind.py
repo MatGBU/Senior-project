@@ -272,4 +272,3 @@ def get_previous_year_Wind(row, reference_df):
     else:
         return wind_values[pos]
     
-wind_main()

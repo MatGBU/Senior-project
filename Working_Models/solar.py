@@ -227,5 +227,3 @@ def get_previous_year_Solar(row, reference_df):
         return solar_values[pos - 1]
     else:
         return solar_values[pos]
-
-solar_main()
