@@ -112,10 +112,10 @@ def working_model():
     solarpredictions = pd.Series(np.array(solarpredictions).ravel())
     refusepredictions = pd.Series(np.array(refusepredictions).ravel())
     woodpredictions = pd.Series(np.array(woodpredictions).ravel())
-
+    
     # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
-        'BeginDate': testdata['BeginDate'],
+        'BeginDate': testdata['BeginDate'] - pd.timedelta(hours = 5),
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,

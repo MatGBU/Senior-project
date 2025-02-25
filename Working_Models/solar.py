@@ -73,7 +73,8 @@ def solar_main():
     # Large computation 
     data['Previous_Year_Solar'] = data.apply(get_previous_year_Solar, axis=1, reference_df=solar_data)
 
-    cutoff_date = pd.to_datetime("2021-10-01").tz_localize(None)
+    #cutoff_date = pd.to_datetime("2021-10-01").tz_localize(None)
+    cutoff_date = now - datetime.timedelta(days=30)
     usable_data = data[data['BeginDate'] > cutoff_date].copy()
     solar_data2 = usable_data[['BeginDate', 'Solar','Previous_Day','Previous_Year']].copy()
 

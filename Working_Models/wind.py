@@ -78,7 +78,8 @@ def wind_main():
 
     data['Previous_Year_Wind'] = data.apply(get_previous_year_Wind, axis=1, reference_df=wind_data)
 
-    cutoff_date = pd.to_datetime("2021-10-01").tz_localize(None)
+    #cutoff_date = pd.to_datetime("2021-10-01").tz_localize(None)
+    cutoff_date = now - datetime.timedelta(days=30)
     usable_data = data[data['BeginDate'] > cutoff_date].copy()
     wind_data2 = usable_data[['BeginDate', 
                             'Wind', 
