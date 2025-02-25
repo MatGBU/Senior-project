@@ -38,7 +38,7 @@ def pullWeatherData(csv_filename):
 
     if latest_date is None:
         # If no existing data, start from a default date (e.g., one year ago)
-        start_date = today - timedelta(days=365)
+        start_date = today - timedelta(days=30)
     else:
         # Start fetching data from the day after the latest date in the CSV
         start_date = latest_date + timedelta(days=1)
@@ -51,14 +51,20 @@ def pullWeatherData(csv_filename):
 
 
 def get_latest_date_from_csv(file_path):
-    df = pd.read_csv(file_path)  
-    print(df.columns)  # Debugging step
-    if 'datetime' in df.columns:
-        df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%dT%H:%M:%S', errors='coerce')
-        latest_date = df['datetime'].max().date()
-        print(latest_date)
-    else:
-        print("Column 'datetime' not found. Available columns:", df.columns)
+    try:
+        df = pd.read_csv(file_path)  # Load the CSV file
+        if 'datetime' in df.columns:
+            df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%dT%H:%M:%S', errors='coerce')
+            latest_date = df['datetime'].max()  # Get the maximum datetime value
+            if pd.notna(latest_date):
+                print("Latest date in the data:", latest_date.date())  # Print the latest date
+                return latest_date.date()  # Return the latest date
+            else:
+                print("No valid datetime entries found.")
+        else:
+            print("Column 'datetime' not found. Available columns are:", df.columns.tolist())
+    except Exception as e:
+        print("Error processing the CSV file:", e)
     return None
 
 
