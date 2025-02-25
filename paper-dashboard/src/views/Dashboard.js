@@ -34,7 +34,7 @@ function Dashboard() {
   useEffect(() => {
     async function loadLineChartDataone() {
       try {
-        const response = await fetch("http://localhost:8080/energy_predictions.csv");
+        const response = await fetch("/data/energy_predictions.csv");
         const csvText = await response.text();
 
         // Parse the CSV
@@ -101,7 +101,7 @@ function Dashboard() {
   useEffect(() => {
     async function loadPieChartData() {
       try {
-        const response = await fetch("http://127.0.0.1:8080/TwoYear_Training_Set_Copy.csv");
+        const response = await fetch("/data//TwoYear_Training_Set_Copy.csv");
         const csvText = await response.text();
 
         // Parse the CSV
@@ -143,7 +143,7 @@ function Dashboard() {
 useEffect(() => {
   async function loadLineChartDatatwo() {
     try {
-      const response = await fetch("http://localhost:8080/energy_predictions.csv");
+      const response = await fetch("/data/energy_predictions.csv");
       const csvText = await response.text();
 
       // Parse the CSV

@@ -2,7 +2,7 @@
 import { Chart } from 'chart.js';
 // Fetch and parse CSV data
 export async function fetchDataFromCSV() {
-  const response = await fetch('http://localhost:8080/energy_predictions.csv');
+  const response = await fetch('paper-dashboard/public/data/energy_predictions.csv');
   const data = await response.text();
   
   const labels = [];
