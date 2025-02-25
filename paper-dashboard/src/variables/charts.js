@@ -26,98 +26,61 @@ export async function fetchDataFromCSV() {
 }
 
 // Initialize and render the chart
-export async function predictiongraph(){
+export async function predictiongraph() {
   const { labels, hydroData, nuclearData, windData, solarData } = await fetchDataFromCSV();
 
-    // Check if data is loaded before continuing
-    if (!labels || !hydroData || !nuclearData || !windData || !solarData) {
-      console.error("Data is incomplete or undefined");
-      return;
-    }
-  // Get the canvas context from the HTML
-  const ctx = document.getElementById('myChart').getContext('2d');
-  
-  // Define the chart configuration with the fetched data
-  new Chart(ctx, {
-    type: 'line',  // Specify the chart type
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "Hydro",
-          borderColor: "#6bd098",
-          backgroundColor: "#6bd098",
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          data: hydroData, // dynamic hydro data
-        },
-        {
-          label: "Nuclear",
-          borderColor: "#f17e5d",
-          backgroundColor: "#f17e5d",
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          data: nuclearData, // dynamic nuclear data
-        },
-        {
-          label: "Wind",
-          borderColor: "#fcc468",
-          backgroundColor: "#fcc468",
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          data: windData, // dynamic wind data
-        },
-        {
-          label: "Solar",
-          borderColor: "#1f8ef1",
-          backgroundColor: "#1f8ef1",
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          data: solarData, // dynamic solar data
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: { display: true }, // Enable legend
-        tooltip: { enabled: true }, // Enable tooltips
+  if (!labels || !hydroData || !nuclearData || !windData || !solarData) {
+    console.error("Data is incomplete or undefined");
+    return null; // Return null instead of breaking the app
+  }
+
+  return {
+    labels: labels,
+    datasets: [
+      {
+        label: "Hydro",
+        borderColor: "#6bd098",
+        backgroundColor: "#6bd098",
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        data: hydroData,
       },
-      scales: {
-        y: {
-          ticks: {
-            color: "#9f9f9f",
-            beginAtZero: false,
-            maxTicksLimit: 5,
-          },
-          grid: {
-            drawBorder: false,
-            display: false,
-          },
-        },
-        x: {
-          barPercentage: 1.6,
-          grid: {
-            drawBorder: false,
-            display: false,
-          },
-          ticks: {
-            padding: 20,
-            color: "#9f9f9f",
-          },
-        },
+      {
+        label: "Nuclear",
+        borderColor: "#f17e5d",
+        backgroundColor: "#f17e5d",
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        data: nuclearData,
       },
-    },
-  });
+      {
+        label: "Wind",
+        borderColor: "#fcc468",
+        backgroundColor: "#fcc468",
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        data: windData,
+      },
+      {
+        label: "Solar",
+        borderColor: "#1f8ef1",
+        backgroundColor: "#1f8ef1",
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        data: solarData,
+      },
+    ],
+  };
 }

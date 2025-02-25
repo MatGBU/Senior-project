@@ -551,4 +551,4 @@ function Icons() {
   );
 }
 
-export default Icons;
+export { Icons };
