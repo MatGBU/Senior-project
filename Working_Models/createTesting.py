@@ -21,9 +21,9 @@ password = 'Mq75eg8pxTBCEKY'
 # Specify date range and output CSV file
 start_date = datetime.now()  # Start date is today
 end_date = start_date + timedelta(days=1)  # End date is tomorrow
-iso_csv_file = "hourly_load_forecast.csv"
-weather_csv_file = "weather_forecast_test.csv"
-output_csv = "testing.csv"
+iso_csv_file = "../hourly_load_forecast.csv"
+weather_csv_file = "../weather_forecast_test.csv"
+output_csv = "../testing.csv"
 
 
 # Run the script
