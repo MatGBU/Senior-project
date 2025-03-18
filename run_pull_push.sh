@@ -13,11 +13,15 @@ git pull origin "${branch}"
 echo "Running Python scripts..."
 cd Working_Models
 echo "In working models directory!"
-python3 backend.py
+/c/Users/alean/AppData/Local/Programs/Python/Python312/python.exe backend.py
 
 # staging changes
 echo "Staging changes..."
-git add *
+git add ../AutoCombine.csv
+git add ../Year_weather.csv
+git add ../hourly_load_forecast.csv
+git add ../testing.csv
+git add ../weather_forecast_test.csv
 
 # commit changes
 echo "Committing changes..."

@@ -13,7 +13,7 @@ from tensorflow.keras.layers import LeakyReLU, Dropout, BatchNormalization
 
 now =  datetime.datetime.now()
 def wind_main():
-    data = pd.read_csv('AutoCombine.csv')       # NOTE: this path worked for me but need to make sure it works in general... it didnt like the ../
+    data = pd.read_csv('../AutoCombine.csv')       # NOTE: this path worked for me but need to make sure it works in general... it didnt like the ../
     data = data.fillna(0)
     data['BeginDate'] = pd.to_datetime(data['BeginDate']).dt.tz_localize(None)
 
@@ -185,7 +185,7 @@ def wind_main():
     percent_error = mae / average_y_test
     
     # write to file (log)
-    with open('Working_Models/Wind_generation_errors.txt', 'a') as file:
+    with open('Wind_generation_errors.txt', 'a') as file:
         file.write('====================================================================================\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Test Loss: {test_loss}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Mean Absolute Error (MAE): {mae}\n')
@@ -194,7 +194,7 @@ def wind_main():
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Percent Error (PERR): {percent_error}\n')
         file.write('====================================================================================\n')
 
-    model.save('Working_Models/WindModel.h5')
+    model.save('WindModel.h5')
 
 
 # functions

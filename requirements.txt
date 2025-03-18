@@ -7,3 +7,6 @@ python-jose
 jinja2
 rich
 python-kasa
+scikit-learn
+tensorflow
+pandas

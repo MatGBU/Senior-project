@@ -14,7 +14,7 @@ fuel_csv = '../genfuelmix_aggregatedyear.csv'
 output_csv = '../AutoCombine.csv'
 def total_backend(): 
     pullAllData(weather_csv, fuel_csv, output_csv)
-    # gather_combine_testing()
+    gather_combine_testing()
     # hydro_main() 
     # landfill() 
     # nuclear_main() 

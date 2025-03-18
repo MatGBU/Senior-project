@@ -10,18 +10,28 @@ from sklearn.preprocessing import StandardScaler
 
 def working_model():
     print('Hello')
-    base_dir = Path.home() / 'Documents' / 'Senior-project' / 'Working_Models'
-    windmodel = load_model(base_dir / 'WindModel.h5')
-    nuclearmodel = load_model(base_dir / 'NuclearModel.h5')
-    hydromodel = load_model(base_dir / 'HydroModel.h5')
-    solarmodel = load_model(base_dir / 'SolarModel.h5')
-    refusemodel = load_model(base_dir / 'RefuseModel.h5')
-    woodmodel = load_model(base_dir / 'WoodModel.h5')
+    # base_dir = Path.home() / 'Documents' / 'Senior-project' / 'Working_Models'
+    # windmodel = load_model(base_dir / 'WindModel.h5')
+    # nuclearmodel = load_model(base_dir / 'NuclearModel.h5')
+    # hydromodel = load_model(base_dir / 'HydroModel.h5')
+    # solarmodel = load_model(base_dir / 'SolarModel.h5')
+    # refusemodel = load_model(base_dir / 'RefuseModel.h5')
+    # woodmodel = load_model(base_dir / 'WoodModel.h5')
+    windmodel = load_model('WindModel.h5')
+    nuclearmodel = load_model('NuclearModel.h5')
+    hydromodel = load_model('HydroModel.h5')
+    solarmodel = load_model('SolarModel.h5')
+    refusemodel = load_model('RefuseModel.h5')
+    woodmodel = load_model('WoodModel.h5')
+    landfillmodel = load_model('LandfillModel.h5')
+    
+
+
     #Loading and proccesing Test Data 
-    testdata = pd.read_csv('./testing.csv')
+    testdata = pd.read_csv('../testing.csv')
     testdata['BeginDate'] = pd.to_datetime(testdata['BeginDate'])
     testdata['BeginDate'] = testdata['BeginDate'] - timedelta(hours=5)
-    trainingdata = pd.read_csv('./AutoCombine.csv')
+    trainingdata = pd.read_csv('../AutoCombine.csv')
     testdata['Sum'] = testdata['LoadMw']
     testdata['BeginDate'] = pd.to_datetime(testdata['BeginDate']).dt.tz_localize(None)
     testdata['Previous_Day'] = testdata['BeginDate'] - pd.Timedelta(days=1)

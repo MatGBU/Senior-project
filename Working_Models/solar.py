@@ -15,7 +15,7 @@ import datetime
 now = datetime.datetime.now()
 def solar_main():
 
-    data = pd.read_csv('./AutoCombine.csv')     # updated
+    data = pd.read_csv('../AutoCombine.csv')     # updated
     data = data.fillna(0)
     data['BeginDate'] = pd.to_datetime(data['BeginDate']).dt.tz_localize(None)
 
@@ -145,14 +145,16 @@ def solar_main():
     rmse = np.sqrt(mse)
     average_y_test = np.mean(y_test)
     percent_error = mae / average_y_test
-    with open('Working_Models/Solar_generation_errors.txt', 'a') as file:
+    with open('Solar_generation_errors.txt', 'a') as file:
+        file.write('====================================================================================\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Test Loss: {test_loss}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Mean Absolute Error (MAE): {mae}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Mean Squared Error (MSE): {mse}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Root Mean Squared Error (RMSE): {rmse}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Percent Error (PERR): {percent_error}\n')
+        file.write('====================================================================================\n')
 
-    model.save('Working_Models/SolarModel.h5')
+    model.save('SolarModel.h5')
 
 def get_previous_day_Solar(row, reference_df):
     # Sort reference_df by 'BeginDate' for fast lookups

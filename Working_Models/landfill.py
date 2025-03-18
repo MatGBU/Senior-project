@@ -15,7 +15,7 @@ now = datetime.datetime.now()
 
 def landfill():
     #Loaing Data and Pre-Proccess
-    data = pd.read_csv('/Users/dltc2020/Documents/Senior-project/AutoCombine.csv')
+    data = pd.read_csv('../AutoCombine.csv')
     data = data.fillna(0)
     data['BeginDate'] = pd.to_datetime(data['BeginDate']).dt.tz_localize(None)
     data["Sum"] = data[["Coal", "Hydro", "Natural Gas", "Nuclear", "Oil", "Other", "Landfill Gas", "Refuse", "Solar", "Wind", "Wood"]].sum(axis=1)
@@ -79,14 +79,16 @@ def landfill():
     rmse = np.sqrt(mse)
     average_y_test = np.mean(y_test)
     percent_error = mae / average_y_test
-    with open('Working_Models/landfill_generation_errors.txt', 'a') as file:
+    with open('landfill_generation_errors.txt', 'a') as file:
+        file.write('====================================================================================\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Test Loss: {test_loss}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Mean Absolute Error (MAE): {mae}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Mean Squared Error (MSE): {mse}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Root Mean Squared Error (RMSE): {rmse}\n')
         file.write(f'{now.strftime("%Y-%m-%d %H:%M:%S")} - Percent Error (PERR): {percent_error}\n')
+        file.write('====================================================================================\n')
 
-    model.save('Working_Models/LandfillModel.h5')
+    model.save('LandfillModel.h5')
 
 
 def get_previous_day_Wind(row, reference_df):
