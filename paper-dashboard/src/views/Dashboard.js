@@ -205,7 +205,7 @@ useEffect(() => {
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Power Usage</p>
+                      <p className="card-category">Today's Generation</p>
                       <CardTitle tag="p">150kW</CardTitle>
                       <p />
                     </div>
@@ -215,7 +215,7 @@ useEffect(() => {
               <CardFooter>
                 <hr />
                 <div className="stats">
-                  <i className="fas fa-sync-alt" /> Update Now
+                  <i className="far fa-calendar" /> EDIT Today's Date
                 </div>
               </CardFooter>
             </Card>
@@ -226,13 +226,13 @@ useEffect(() => {
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-money-coins text-success" />
+                      <i className="nc-icon nc-bulb-63 text-success" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Money Saved</p>
-                      <CardTitle tag="p">$ 14</CardTitle>
+                      <p className="card-category">Most Energy From</p>
+                      <CardTitle tag="p">Natural Gas</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -258,7 +258,7 @@ useEffect(() => {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Sources of Energy</p>
-                      <CardTitle tag="p">5</CardTitle>
+                      <CardTitle tag="p">11</CardTitle>
                       <p />
                     </div>
                   </Col>
