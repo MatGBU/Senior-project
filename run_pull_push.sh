@@ -17,11 +17,9 @@ echo "In working models directory!"
 
 # staging changes
 echo "Staging changes..."
-git add ../AutoCombine.csv
-git add ../Year_weather.csv
-git add ../hourly_load_forecast.csv
-git add ../testing.csv
-git add ../weather_forecast_test.csv
+git add *.txt
+git add *.csv
+git add *.h5
 
 # commit changes
 echo "Committing changes..."
@@ -30,3 +28,5 @@ git commit -m "auto-pull/push on $(date '+%Y-%m-%d %H:%M:%S')"
 # push changes
 echo "Pushing changes..."
 git push origin "${branch}"
+
+sleep 86400
