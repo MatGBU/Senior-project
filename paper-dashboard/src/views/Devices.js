@@ -15,7 +15,7 @@ function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
     axios
-      .get(`http://127.0.0.1:8080/turn_on?input=${input}`)  // FastAPI backend URL
+      .get(`http://167.88.45.119:8000/turn_on?input=${input}`)  // FastAPI backend URL
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
