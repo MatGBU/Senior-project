@@ -13,15 +13,30 @@ import {
 
 function Devices() {
   // Function to handle "Turn On" button click
+  // const handleTurnOn = (input) => {
+  //   axios
+  //     .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
+  //     .then((response) => {
+  //       console.log(response.data.status);  // Log the response message
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error turning on the device:", error);
+  //     });
+  // };
+  const fs = require('fs');
+
   const handleTurnOn = (input) => {
-    axios
-      .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error turning on the device:", error);
-      });
+    // Define the data to be written to the file
+    const data = `Input received: ${input}\n`;
+
+    // Write the data to a file (append mode)
+    fs.appendFile('output_handleon.txt', data, (err) => {
+      if (err) {
+        console.error("There was an error writing to the file:", err);
+      } else {
+        console.log("Data written to file successfully.");
+      }
+    });
   };
 
   // Function to handle "Turn Off" button click
