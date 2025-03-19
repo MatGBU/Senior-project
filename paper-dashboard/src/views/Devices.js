@@ -15,12 +15,7 @@ function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
     axios
-      .get(`http://127.0.0.1:8000/turn_on?input=${input}`, {
-        headers: {
-          'Content-Type': 'application/json',  // Ensure content type is correct
-          'Access-Control-Allow-Origin': '*',  // Allow all origins (or specify the specific client origin if needed)
-        },
-      })
+      .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
@@ -28,7 +23,6 @@ function Devices() {
         console.error("There was an error turning on the device:", error);
       });
   };
-  
 
   // Function to handle "Turn Off" button click
   const handleTurnOff = (input) => {
