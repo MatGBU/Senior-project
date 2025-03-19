@@ -15,7 +15,7 @@ function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
     axios
-      .get(`https://63b1-128-197-28-191.ngrok-free.app/turn_on?input=${input}`, {
+      .get(`https://5b92-128-197-28-191.ngrok-free.app/turn_on?input=${input}`, {
         headers: new Headers({
           "ngrok-skip-browser-warning": "69420",  // Custom header
         }),
