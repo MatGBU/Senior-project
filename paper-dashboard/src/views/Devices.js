@@ -13,28 +13,78 @@ import {
 
 function Devices() {
   // Function to handle "Turn On" button click
+  // const handleTurnOn = (input) => {
+  //   axios
+  //     .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
+  //     .then((response) => {
+  //       console.log(response.data.status);  // Log the response message
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error turning on the device:", error);
+  //     });
+  // };
+
+  // // Function to handle "Turn Off" button click
+  // const handleTurnOff = (input) => {
+  //   axios
+  //     .get(`http://127.0.0.1:8000/turn_off?input=${input}`)  // FastAPI backend URL
+  //     .then((response) => {
+  //       console.log(response.data.status);  // Log the response message
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error turning off the device:", error);
+  //     });
+  // };
+  const { exec } = require('child_process');
+
+  // Function to handle "Turn On" button click using curl
   const handleTurnOn = (input) => {
-    axios
-      .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error turning on the device:", error);
-      });
+    const curlCommand = `curl "http://127.0.0.1:8000/turn_on?input=${input}"`;  // Replace axios with curl
+
+    exec(curlCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+
+      // Parse and log the output of the curl command
+      try {
+        const response = JSON.parse(stdout); // Assuming the response is JSON
+        console.log(response.status);  // Log the response message
+      } catch (e) {
+        console.error('Error parsing response:', e);
+      }
+    });
   };
 
-  // Function to handle "Turn Off" button click
+  // Function to handle "Turn Off" button click using curl
   const handleTurnOff = (input) => {
-    axios
-      .get(`http://127.0.0.1:8000/turn_off?input=${input}`)  // FastAPI backend URL
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error turning off the device:", error);
-      });
+    const curlCommand = `curl "http://127.0.0.1:8000/turn_off?input=${input}"`;  // Replace axios with curl
+
+    exec(curlCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+
+      // Parse and log the output of the curl command
+      try {
+        const response = JSON.parse(stdout); // Assuming the response is JSON
+        console.log(response.status);  // Log the response message
+      } catch (e) {
+        console.error('Error parsing response:', e);
+      }
+    });
   };
+
 
   const handleSchedule = (input) => {
     axios
