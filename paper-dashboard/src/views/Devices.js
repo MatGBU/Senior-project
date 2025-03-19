@@ -15,7 +15,11 @@ function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
     axios
-      .get(`http://2367-128-197-28-191.ngrok-free.app/turn_on?input=${input}`)  // FastAPI backend URL
+      .get(`http://2367-128-197-28-191.ngrok-free.app/turn_on?input=${input}`, {
+        headers: new Headers({
+          "ngrok-skip-browser-warning": "69420",  // Custom header
+        }),
+      })
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
@@ -23,6 +27,7 @@ function Devices() {
         console.error("There was an error turning on the device:", error);
       });
   };
+  
 
   // Function to handle "Turn Off" button click
   const handleTurnOff = (input) => {
