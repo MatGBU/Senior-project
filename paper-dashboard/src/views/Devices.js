@@ -35,55 +35,30 @@ function Devices() {
   //       console.error("There was an error turning off the device:", error);
   //     });
   // };
-  const { exec } = require('child_process');
-
-  // Function to handle "Turn On" button click using curl
+  // Function to handle "Turn On" button click using fetch
   const handleTurnOn = (input) => {
-    const curlCommand = `curl "http://127.0.0.1:8000/turn_on?input=${input}"`;  // Replace axios with curl
-
-    exec(curlCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-      }
-
-      // Parse and log the output of the curl command
-      try {
-        const response = JSON.parse(stdout); // Assuming the response is JSON
-        console.log(response.status);  // Log the response message
-      } catch (e) {
-        console.error('Error parsing response:', e);
-      }
-    });
+    fetch(`http://127.0.0.1:8000/turn_on?input=${input}`)
+      .then((response) => response.json())  // Parse the JSON response
+      .then((data) => {
+        console.log(data.status);  // Log the response message
+      })
+      .catch((error) => {
+        console.error("There was an error turning on the device:", error);
+      });
   };
 
-  // Function to handle "Turn Off" button click using curl
+  // Function to handle "Turn Off" button click using fetch
   const handleTurnOff = (input) => {
-    const curlCommand = `curl "http://127.0.0.1:8000/turn_off?input=${input}"`;  // Replace axios with curl
-
-    exec(curlCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-      }
-
-      // Parse and log the output of the curl command
-      try {
-        const response = JSON.parse(stdout); // Assuming the response is JSON
-        console.log(response.status);  // Log the response message
-      } catch (e) {
-        console.error('Error parsing response:', e);
-      }
-    });
+    fetch(`http://127.0.0.1:8000/turn_off?input=${input}`)
+      .then((response) => response.json())  // Parse the JSON response
+      .then((data) => {
+        console.log(data.status);  // Log the response message
+      })
+      .catch((error) => {
+        console.error("There was an error turning off the device:", error);
+      });
   };
+
 
 
   const handleSchedule = (input) => {
