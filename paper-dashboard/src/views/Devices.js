@@ -15,7 +15,7 @@ function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
     axios
-      .get(`fast-kid-sterling.ngrok-free.app/turn_on?input=${input}`, {
+      .get(`https://c312-128-197-28-191.ngrok-free.app/turn_on?input=${input}`, {
         headers: new Headers({
           "ngrok-skip-browser-warning": "69420",  // Custom header
         }),
