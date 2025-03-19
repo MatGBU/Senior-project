@@ -13,53 +13,34 @@ import {
 
 function Devices() {
   // Function to handle "Turn On" button click
-  // const handleTurnOn = (input) => {
-  //   axios
-  //     .get(`http://127.0.0.1:8000/turn_on?input=${input}`)  // FastAPI backend URL
-  //     .then((response) => {
-  //       console.log(response.data.status);  // Log the response message
-  //     })
-  //     .catch((error) => {
-  //       console.error("There was an error turning on the device:", error);
-  //     });
-  // };
-
-  // // Function to handle "Turn Off" button click
-  // const handleTurnOff = (input) => {
-  //   axios
-  //     .get(`http://127.0.0.1:8000/turn_off?input=${input}`)  // FastAPI backend URL
-  //     .then((response) => {
-  //       console.log(response.data.status);  // Log the response message
-  //     })
-  //     .catch((error) => {
-  //       console.error("There was an error turning off the device:", error);
-  //     });
-  // };
-  // Function to handle "Turn On" button click using fetch
   const handleTurnOn = (input) => {
-    fetch(`http://127.0.0.1:8000/turn_on?input=${input}`)
-      .then((response) => response.json())  // Parse the JSON response
-      .then((data) => {
-        console.log(data.status);  // Log the response message
+    axios
+      .get(`http://127.0.0.1:8000/turn_on?input=${input}`, {
+        headers: {
+          'Content-Type': 'application/json',  // Ensure content type is correct
+          'Access-Control-Allow-Origin': '*',  // Allow all origins (or specify the specific client origin if needed)
+        },
+      })
+      .then((response) => {
+        console.log(response.data.status);  // Log the response message
       })
       .catch((error) => {
         console.error("There was an error turning on the device:", error);
       });
   };
+  
 
-  // Function to handle "Turn Off" button click using fetch
+  // Function to handle "Turn Off" button click
   const handleTurnOff = (input) => {
-    fetch(`http://127.0.0.1:8000/turn_off?input=${input}`)
-      .then((response) => response.json())  // Parse the JSON response
-      .then((data) => {
-        console.log(data.status);  // Log the response message
+    axios
+      .get(`http://127.0.0.1:8000/turn_off?input=${input}`)  // FastAPI backend URL
+      .then((response) => {
+        console.log(response.data.status);  // Log the response message
       })
       .catch((error) => {
         console.error("There was an error turning off the device:", error);
       });
   };
-
-
 
   const handleSchedule = (input) => {
     axios
