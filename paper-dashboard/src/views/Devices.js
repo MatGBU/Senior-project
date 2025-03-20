@@ -27,12 +27,16 @@ function Devices() {
         console.error("There was an error turning on the device:", error);
       });
   };
-  
+
 
   // Function to handle "Turn Off" button click
   const handleTurnOff = (input) => {
     axios
-      .get(`http://127.0.0.1:8000/turn_off?input=${input}`)  // FastAPI backend URL
+      .get(`https://fast-kid-sterling.ngrok-free.app/turn_off?input=${input}`, { 
+        headers: { 
+          "ngrok-skip-browser-warning": "69420", 
+        },
+      })  // FastAPI backend URL
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
@@ -43,7 +47,11 @@ function Devices() {
 
   const handleSchedule = (input) => {
     axios
-      .get(`http://127.0.0.1:8000/schedule?input=${input}`)  // FastAPI backend URL
+      .get(`https://fast-kid-sterling.ngrok-free.app/schedule?input=${input}`, {
+        headers: {
+          "ngrok-skip-browser-warning": "69420", 
+        },
+      })  // FastAPI backend URL
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
@@ -53,7 +61,11 @@ function Devices() {
   }
   const handleDeleteSchedule = (input) => {
     axios
-      .get(`http://127.0.0.1:8000/delete_schedule?input=${input}`)  // FastAPI backend URL
+      .get(`https://fast-kid-sterling.ngrok-free.app/delete_schedule?input=${input}`, {
+        headers: {
+          "ngrok-skip-browser-warning": "69420",
+        },
+      })  // FastAPI backend URL
       .then((response) => {
         console.log(response.data.status);  // Log the response message
       })
@@ -90,7 +102,7 @@ function Devices() {
                     </Button>
                   </Col>
                 </Row>
-  
+
                 {/* Row for "Turn Off" buttons */}
                 <Row className="mt-2">
                   <Col>
@@ -109,7 +121,7 @@ function Devices() {
                     </Button>
                   </Col>
                 </Row>
-  
+
                 {/* Row for "Schedule" buttons */}
                 <Row className="mt-2">
                   <Col>
@@ -128,7 +140,7 @@ function Devices() {
                     </Button>
                   </Col>
                 </Row>
-  
+
                 {/* Row for "Delete Schedule" buttons */}
                 <Row className="mt-2">
                   <Col>
@@ -154,7 +166,7 @@ function Devices() {
       </div>
     </>
   );
-  
+
 }
 
 export default Devices;
