@@ -19,9 +19,7 @@ while true; do
 
     # staging changes
     echo "Staging changes..."
-    git add *.txt
-    git add *.csv
-    git add *.h5
+    git add *
 
     # commit changes
     echo "Committing changes..."
@@ -31,6 +29,7 @@ while true; do
     echo "Pushing changes..."
     git push origin "${branch}"
 
+    echo "Sleeping..."
     sleep 86400
     
     cd ..
