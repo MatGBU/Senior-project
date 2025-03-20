@@ -28,7 +28,7 @@ db.run(`
 `);
 
 // Registration endpoint
-app.post('/api/register', (req, res) => {
+app.post('http://10.193.84.131:5001/api/register', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -57,7 +57,7 @@ app.post('/api/register', (req, res) => {
 });
 
 // Login endpoint
-app.post('/api/login', (req, res) => {
+app.post('http://10.193.84.131:5001/api/login', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
