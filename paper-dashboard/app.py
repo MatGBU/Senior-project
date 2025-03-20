@@ -3,10 +3,24 @@ from fastapi.responses import HTMLResponse
 from kasa import SmartStrip
 from kasa import Module
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 import json, asyncio
 
 app = FastAPI()
+
+# Only allow the specific origin
+origins = [
+    "http://ecostripsolutions.com",  # Your allowed frontend domain
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allow only this specific origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 DEVICE_IP = "192.168.0.133"  # Replace with your actual device IP
 strip = SmartStrip(DEVICE_IP)
@@ -34,12 +48,12 @@ def mil_to_min(time_str):
 
 # Function to turn on the device
 async def turn_on_device(input):
-    print("Turning on")
+    # print("Turning on")
     await strip.update()
     await strip.children[input].turn_on()
     # strip.children[input].modules['schedule'].data['get_rules']['rule_list']
     # print(strip.children[input].modules)
-    print("\n")
+    # print("\n")
     # print(strip.children[input].modules['schedule'])
     # print(strip.modules)
     await strip.update()  # Update device state after turning it on
@@ -108,7 +122,9 @@ async def delete_schedule_device(input):
         print(f"Error: {stderr.decode()}")
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the API!"}
 
 @app.get("/turn_on")
 async def turn_on(input: int):
