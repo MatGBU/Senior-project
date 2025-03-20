@@ -5,28 +5,34 @@ set -e
 # Define the branch
 branch="main"
 
-# pull changes
-echo "Pulling latest changes from github on branch ${branch}..."
-git pull origin "${branch}"
+while true; do
 
-# run python scripts
-echo "Running Python scripts..."
-cd Working_Models
-echo "In working models directory!"
-/c/Users/alean/AppData/Local/Programs/Python/Python312/python.exe backend.py
+    # pull changes
+    echo "Pulling latest changes from github on branch ${branch}..."
+    git pull origin "${branch}"
 
-# staging changes
-echo "Staging changes..."
-git add *.txt
-git add *.csv
-git add *.h5
+    # run python scripts
+    echo "Running Python scripts..."
+    cd Working_Models
+    echo "In working models directory!"
+    /c/Users/alean/AppData/Local/Programs/Python/Python312/python.exe backend.py
 
-# commit changes
-echo "Committing changes..."
-git commit -m "auto-pull/push on $(date '+%Y-%m-%d %H:%M:%S')"
+    # staging changes
+    echo "Staging changes..."
+    git add *.txt
+    git add *.csv
+    git add *.h5
 
-# push changes
-echo "Pushing changes..."
-git push origin "${branch}"
+    # commit changes
+    echo "Committing changes..."
+    git commit -m "auto-pull/push on $(date '+%Y-%m-%d %H:%M:%S')"
 
-sleep 86400
+    # push changes
+    echo "Pushing changes..."
+    git push origin "${branch}"
+
+    sleep 86400
+    
+    cd ..
+
+done
