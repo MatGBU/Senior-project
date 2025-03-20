@@ -136,6 +136,6 @@ def working_model():
 
     # Write the DataFrame to a CSV file
     today_date = datetime.now().strftime('%Y-%m-%d')
-    filename = f'energy_predictions_{today_date}.csv'
+    filename = f'../energy_predictions_{today_date}.csv'
     # Save DataFrame to CSV
     output_df.to_csv(filename, index=False)
