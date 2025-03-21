@@ -1,17 +1,3 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright ...
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-* Coded by Creative Tim
-
-=========================================================
-*/
-
 import React, { useState } from "react";
 import {
   Alert,
@@ -62,7 +48,7 @@ function LoginPage() {
     try {
       if (isRegister) {
         // Call the registration API endpoint
-        const res = await fetch('/api/register', {
+        const res = await fetch('http://10.193.84.131:5001/api/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
