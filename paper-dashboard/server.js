@@ -3,14 +3,13 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 5001; //IT IS CHANGED FROM 5000
 
-app.use(bodyParser.json());
-
-const cors = require('cors');
 app.use(cors());
+app.use(bodyParser.json());
 
 
 // Initialize SQLite database
@@ -32,7 +31,7 @@ db.run(`
 `);
 
 // Registration endpoint
-app.post('http://10.193.84.131:5001/api/register', (req, res) => {
+app.post('/api/register', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -61,7 +60,7 @@ app.post('http://10.193.84.131:5001/api/register', (req, res) => {
 });
 
 // Login endpoint
-app.post('http://10.193.84.131:5001/api/login', (req, res) => {
+app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {

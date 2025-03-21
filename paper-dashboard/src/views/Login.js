@@ -48,7 +48,7 @@ function LoginPage() {
     try {
       if (isRegister) {
         // Call the registration API endpoint
-        const res = await fetch('http://10.193.84.131:5001/api/register', {
+        const res = await fetch('/api/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
