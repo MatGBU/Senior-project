@@ -9,6 +9,10 @@ const PORT = process.env.PORT || 5001; //IT IS CHANGED FROM 5000
 
 app.use(bodyParser.json());
 
+const cors = require('cors');
+app.use(cors());
+
+
 // Initialize SQLite database
 const db = new sqlite3.Database('./users.db', (err) => {
   if (err) {
