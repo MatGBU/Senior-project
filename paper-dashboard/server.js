@@ -30,8 +30,12 @@ db.run(`
   )
 `);
 
+app.get('http://167.88.45.119:5001/test', (req, res) => {                    //TESTING THE ENDPOINTS
+  res.json({ message: 'Test endpoint working' });
+});
+
 // Registration endpoint
-app.post('http://10.193.84.131:5001/api/register', (req, res) => {
+app.post('http://167.88.45.119:5001/api/register', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -60,7 +64,7 @@ app.post('http://10.193.84.131:5001/api/register', (req, res) => {
 });
 
 // Login endpoint
-app.post('http://10.193.84.131:5001/api/login', (req, res) => {
+app.post('http://167.88.45.119:5001/api/login', (req, res) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
