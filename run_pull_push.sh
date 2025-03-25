@@ -20,6 +20,8 @@ while true; do
     # staging changes
     echo "Staging changes..."
     git add *
+    cd ..
+    git add *
 
     # commit changes
     echo "Committing changes..."
@@ -30,8 +32,8 @@ while true; do
     git push origin "${branch}"
 
     echo "Sleeping..."
-    sleep 86400
+    # sleep 86400
     
-    cd ..
+    
 
 done
