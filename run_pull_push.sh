@@ -6,7 +6,7 @@ set -e
 branch="main"
 
 while true; do
-
+    
     # pull changes
     echo "Pulling latest changes from github on branch ${branch}..."
     git pull origin "${branch}"
@@ -32,8 +32,6 @@ while true; do
     git push origin "${branch}"
 
     echo "Sleeping..."
-    # sleep 86400
-    
-    
+    sleep 86400
 
 done
