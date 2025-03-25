@@ -11,6 +11,8 @@ import {
   Col,
 } from "reactstrap";
 
+import { FaPowerOff, FaClock, FaTrashAlt, FaPlus } from "react-icons/fa";
+
 function Devices() {
   // Function to handle "Turn On" button click
   const handleTurnOn = (input) => {
@@ -73,96 +75,229 @@ function Devices() {
         console.error("There was an error scheduling the device:", error);
       });
   }
-
+  const handleTurnOnAll = () => {
+    // Turn on all outlets
+    handleTurnOn(0);
+    handleTurnOn(1);
+    handleTurnOn(2);
+  };
+  
+  const handleTurnOffAll = () => {
+    // Turn off all outlets
+    handleTurnOff(0);
+    handleTurnOff(1);
+    handleTurnOff(2);
+  };
+  
+  const handleScheduleAll = () => {
+    // Schedule all outlets
+    handleSchedule(0);
+    handleSchedule(1);
+    handleSchedule(2);
+  };
+  
+  const handleDeleteScheduleAll = () => {
+    // Delete schedule for all outlets
+    handleDeleteSchedule(0);
+    handleDeleteSchedule(1);
+    handleDeleteSchedule(2);
+  };
+  
+  const handleAddNewDevice = () => {
+    // Logic for adding a new device
+    console.log("Add New Device button clicked");
+  };
+  
   return (
     <>
       <div className="content">
-        <Row>
-          <Col md="12">
-            <Card>
-              <CardHeader>
-                <CardTitle tag="h4">Kasa Smart Wi-Fi Power Strip</CardTitle>
-              </CardHeader>
-              <CardBody>
-                {/* Row for "Turn On" buttons */}
-                <Row>
-                  <Col>
-                    <Button color="success" onClick={() => handleTurnOn(0)}>
-                      Turn On - 0
+        {/* Parent Card: Kasa Smart Power Strip */}
+        <Card className="window-card">
+          <CardHeader>
+            <CardTitle tag="h4">Kasa Smart Wi-Fi Power Strip</CardTitle>
+          </CardHeader>
+          <CardBody>
+            {/* Global Buttons: Turn On, Turn Off, Schedule, Remove Schedule */}
+            <Row className="mb-4">
+              <Col md="3">
+                <Button color="success" block onClick={handleTurnOnAll} title="Turn On All Outlets">
+                  <FaPowerOff /> Turn On All
+                </Button>
+              </Col>
+              <Col md="3">
+                <Button color="danger" block onClick={handleTurnOffAll} title="Turn Off All Outlets">
+                  <FaPowerOff /> Turn Off All
+                </Button>
+              </Col>
+              <Col md="3">
+                <Button color="primary" block onClick={handleScheduleAll} title="Schedule All Outlets">
+                  <FaClock /> Schedule All
+                </Button>
+              </Col>
+              <Col md="3">
+                <Button color="warning" block onClick={handleDeleteScheduleAll} title="Delete Schedule for All">
+                  <FaTrashAlt /> Delete Schedule All
+                </Button>
+              </Col>
+            </Row>
+  
+            {/* Row for Outlet 1, Outlet 2, and Outlet 3 */}
+            <Row>
+              {/* Outlet 1 */}
+              <Col md="4">
+                <Card className="outlet-card">
+                  <CardHeader>
+                    <CardTitle tag="h5">Outlet 1</CardTitle>
+                  </CardHeader>
+                  <CardBody>
+                    <Button
+                      color="success"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOn(0)}
+                      title="Turn On Outlet 1"
+                    >
+                      <FaPowerOff /> Turn On
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="success" onClick={() => handleTurnOn(1)}>
-                      Turn On - 1
+                    <Button
+                      color="danger"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOff(0)}
+                      title="Turn Off Outlet 1"
+                    >
+                      <FaPowerOff /> Turn Off
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="success" onClick={() => handleTurnOn(2)}>
-                      Turn On - 2
+                    <Button
+                      color="primary"
+                      size="sm"
+                      block
+                      onClick={() => handleSchedule(0)}
+                      title="Schedule Outlet 1"
+                    >
+                      <FaClock /> Schedule
                     </Button>
-                  </Col>
-                </Row>
-
-                {/* Row for "Turn Off" buttons */}
-                <Row className="mt-2">
-                  <Col>
-                    <Button color="danger" onClick={() => handleTurnOff(0)}>
-                      Turn Off - 0
+                    <Button
+                      color="warning"
+                      size="sm"
+                      block
+                      onClick={() => handleDeleteSchedule(0)}
+                      title="Delete Schedule Outlet 1"
+                    >
+                      <FaTrashAlt /> Delete Schedule
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="danger" onClick={() => handleTurnOff(1)}>
-                      Turn Off - 1
+                  </CardBody>
+                </Card>
+              </Col>
+  
+              {/* Outlet 2 */}
+              <Col md="4">
+                <Card className="outlet-card">
+                  <CardHeader>
+                    <CardTitle tag="h5">Outlet 2</CardTitle>
+                  </CardHeader>
+                  <CardBody>
+                    <Button
+                      color="success"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOn(1)}
+                      title="Turn On Outlet 2"
+                    >
+                      <FaPowerOff /> Turn On
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="danger" onClick={() => handleTurnOff(2)}>
-                      Turn Off - 2
+                    <Button
+                      color="danger"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOff(1)}
+                      title="Turn Off Outlet 2"
+                    >
+                      <FaPowerOff /> Turn Off
                     </Button>
-                  </Col>
-                </Row>
-
-                {/* Row for "Schedule" buttons */}
-                <Row className="mt-2">
-                  <Col>
-                    <Button color="primary" onClick={() => handleSchedule(0)}>
-                      Schedule - 0
+                    <Button
+                      color="primary"
+                      size="sm"
+                      block
+                      onClick={() => handleSchedule(1)}
+                      title="Schedule Outlet 2"
+                    >
+                      <FaClock /> Schedule
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="primary" onClick={() => handleSchedule(1)}>
-                      Schedule - 1
+                    <Button
+                      color="warning"
+                      size="sm"
+                      block
+                      onClick={() => handleDeleteSchedule(1)}
+                      title="Delete Schedule Outlet 2"
+                    >
+                      <FaTrashAlt /> Delete Schedule
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="primary" onClick={() => handleSchedule(2)}>
-                      Schedule - 2
+                  </CardBody>
+                </Card>
+              </Col>
+  
+              {/* Outlet 3 */}
+              <Col md="4">
+                <Card className="outlet-card">
+                  <CardHeader>
+                    <CardTitle tag="h5">Outlet 3</CardTitle>
+                  </CardHeader>
+                  <CardBody>
+                    <Button
+                      color="success"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOn(2)}
+                      title="Turn On Outlet 3"
+                    >
+                      <FaPowerOff /> Turn On
                     </Button>
-                  </Col>
-                </Row>
-
-                {/* Row for "Delete Schedule" buttons */}
-                <Row className="mt-2">
-                  <Col>
-                    <Button color="warning" onClick={() => handleDeleteSchedule(0)}>
-                      Delete Schedule - 0
+                    <Button
+                      color="danger"
+                      size="sm"
+                      block
+                      onClick={() => handleTurnOff(2)}
+                      title="Turn Off Outlet 3"
+                    >
+                      <FaPowerOff /> Turn Off
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="warning" onClick={() => handleDeleteSchedule(1)}>
-                      Delete Schedule - 1
+                    <Button
+                      color="primary"
+                      size="sm"
+                      block
+                      onClick={() => handleSchedule(2)}
+                      title="Schedule Outlet 3"
+                    >
+                      <FaClock /> Schedule
                     </Button>
-                  </Col>
-                  <Col>
-                    <Button color="warning" onClick={() => handleDeleteSchedule(2)}>
-                      Delete Schedule - 2
+                    <Button
+                      color="warning"
+                      size="sm"
+                      block
+                      onClick={() => handleDeleteSchedule(2)}
+                      title="Delete Schedule Outlet 3"
+                    >
+                      <FaTrashAlt /> Delete Schedule
                     </Button>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </CardBody>
+        </Card>
+  
+        {/* Add New Device Card */}
+        <Card className="window-card mt-4">
+          <CardHeader>
+            <CardTitle tag="h4">Add New Device</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <Button color="dark" block onClick={handleAddNewDevice} title="Add New Device">
+              <FaPlus /> Add New Device
+            </Button>
+          </CardBody>
+        </Card>
       </div>
     </>
   );

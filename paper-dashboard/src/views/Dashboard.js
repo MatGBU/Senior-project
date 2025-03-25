@@ -30,6 +30,10 @@ function Dashboard() {
     datasets: [],
   });
 
+  // New state for Cleanest Generation info
+  // It will store an object: { day, bestTime, generation, subsequentRows }
+  const [cleanestGeneration, setCleanestGeneration] = useState(null);
+
   // Fetch data for the first Line Chart
   useEffect(() => {
     async function loadLineChartDataone() {
@@ -37,7 +41,7 @@ function Dashboard() {
         const response = await fetch("/data/energy_predictions.csv");
         const csvText = await response.text();
 
-        // Parse the CSV
+        // Parse the CSV assuming first row as header
         const rows = csvText.split("\n").map((row) => row.split(","));
         const headers = rows[0];
         const dataRows = rows.slice(1).filter((row) => row.length === headers.length);
@@ -139,87 +143,182 @@ function Dashboard() {
     loadPieChartData();
   }, []);
 
-// Fetch data for the second Line Chart
+  // Fetch data for the second Line Chart
+  useEffect(() => {
+    async function loadLineChartDatatwo() {
+      try {
+        const response = await fetch("/data/energy_predictions.csv");
+        const csvText = await response.text();
+
+        // Parse the CSV
+        const rows = csvText.split("\n").map((row) => row.split(","));
+        const headers = rows[0];
+        const dataRows = rows.slice(1).filter((row) => row.length === headers.length);
+
+        const labels = dataRows.map((row) => row[0]); // Dates as labels
+        const refuseData = dataRows.map((row) => parseFloat(row[5]) || 0); // refuse
+        const woodData = dataRows.map((row) => parseFloat(row[6]) || 0); // wood
+
+        setLineChartDatatwo({
+          labels: labels,
+          datasets: [
+            {
+              label: "Refuse",
+              borderColor: "#6bd098",
+              backgroundColor: "#6bd098",
+              data: refuseData,
+              fill: false,
+              tension: 0.4,
+              borderWidth: 3,
+            },
+            {
+              label: "Wood",
+              borderColor: "#f17e5d",
+              backgroundColor: "#f17e5d",
+              data: woodData,
+              fill: false,
+              tension: 0.4,
+              borderWidth: 3,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error("Error loading line chart data:", error);
+      }
+    }
+
+    loadLineChartDatatwo();
+  }, []);
+
+  // New useEffect to calculate Cleanest Generation for the day and subsequent hours
 useEffect(() => {
-  async function loadLineChartDatatwo() {
+  async function loadCleanestGeneration() {
     try {
       const response = await fetch("/data/energy_predictions.csv");
       const csvText = await response.text();
 
-      // Parse the CSV
+      // Parse CSV: assumes first row is header
+      const rows = csvText.split("\n").map((row) => row.split(","));
+      const headers = rows[0];
+      const dataRows = rows.slice(1).filter(
+        (row) => row.length === headers.length && row[0].trim() !== ""
+      );
+
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split("T")[0];
+
+      // Filter rows to only include today's date
+      const todayRows = dataRows.filter((row) => row[0].startsWith(today));
+
+      if (todayRows.length === 0) {
+        console.warn("No data available for today:", today);
+        setCleanestGeneration(null);
+        return;
+      }
+
+      // Find the row with the highest "clean" generation (Hydro + Nuclear + Wind + Solar)
+      let bestIndex = -1;
+      let bestGeneration = -Infinity;
+      todayRows.forEach((row, idx) => {
+        const hydro = parseFloat(row[1]) || 0;
+        const nuclear = parseFloat(row[2]) || 0;
+        const wind = parseFloat(row[3]) || 0;
+        const solar = parseFloat(row[4]) || 0;
+        const total = hydro + nuclear + wind + solar;
+
+        if (total > bestGeneration) {
+          bestGeneration = total;
+          bestIndex = idx;
+        }
+      });
+
+      // Get best row and subsequent data for visualization
+      const bestRow = todayRows[bestIndex] || [];
+      const bestTime = bestRow[0].split(" ")[1] || "Unknown Time";
+
+      setCleanestGeneration({
+        day: today,
+        bestTime: bestTime,
+        generation: bestGeneration,
+        bestIndex: bestIndex,
+      });
+    } catch (error) {
+      console.error("Error loading cleanest generation data:", error);
+    }
+  }
+
+  loadCleanestGeneration();
+}, []);
+
+const [todaysGeneration, setTodaysGeneration] = useState(0);
+
+useEffect(() => {
+  async function loadTodaysGeneration() {
+    try {
+      const response = await fetch("/data/energy_predictions.csv");
+      const csvText = await response.text();
+
+      // Parse CSV
       const rows = csvText.split("\n").map((row) => row.split(","));
       const headers = rows[0];
       const dataRows = rows.slice(1).filter((row) => row.length === headers.length);
 
-      const labels = dataRows.map((row) => row[0]); // Dates as labels
-      const refuseData = dataRows.map((row) => parseFloat(row[5]) || 0); // refuse
-      const woodData = dataRows.map((row) => parseFloat(row[6]) || 0); // wood
+      // Get today's date in "YYYY-MM-DD" format
+      const today = new Date().toISOString().split("T")[0];
 
-      setLineChartDatatwo({
-        labels: labels,
-        datasets: [
-          {
-            label: "Refuse",
-            borderColor: "#6bd098",
-            backgroundColor: "#6bd098",
-            data: refuseData,
-            fill: false,
-            tension: 0.4,
-            borderWidth: 3,
-          },
-          {
-            label: "Wood",
-            borderColor: "#f17e5d",
-            backgroundColor: "#f17e5d",
-            data: woodData,
-            fill: false,
-            tension: 0.4,
-            borderWidth: 3,
-          },
-        ],
-      });
+      // Find the row that matches today's date
+      const todayRow = dataRows.find((row) => row[0].startsWith(today));
+
+      if (todayRow) {
+        const hydro = parseFloat(todayRow[1]) || 0;
+        const nuclear = parseFloat(todayRow[2]) || 0;
+        const wind = parseFloat(todayRow[3]) || 0;
+        const solar = parseFloat(todayRow[4]) || 0;
+
+        // Sum renewable + nuclear generation
+        const totalCleanGeneration = hydro + nuclear + wind + solar;
+        setTodaysGeneration(totalCleanGeneration);
+      }
     } catch (error) {
-      console.error("Error loading line chart data:", error);
+      console.error("Error loading today's generation:", error);
     }
   }
 
-  loadLineChartDatatwo();
+  loadTodaysGeneration();
 }, []);
-
-
-
 
 
   return (
     <>
       <div className="content">
         <Row>
-          <Col lg="3" md="6" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col md="4" xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-globe text-warning" />
-                    </div>
-                  </Col>
-                  <Col md="8" xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Today's Generation</p>
-                      <CardTitle tag="p">150kW</CardTitle>
-                      <p />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardFooter>
-                <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" /> EDIT Today's Date
-                </div>
-              </CardFooter>
-            </Card>
-          </Col>
+        <Col lg="3" md="6" sm="6">
+  <Card className="card-stats">
+    <CardBody>
+      <Row>
+        <Col md="4" xs="5">
+          <div className="icon-big text-center icon-warning">
+            <i className="nc-icon nc-globe text-warning" />
+          </div>
+        </Col>
+        <Col md="8" xs="7">
+          <div className="numbers">
+            <p className="card-category">Peak Supply</p>
+            <CardTitle tag="p">{todaysGeneration.toFixed(2)} MW</CardTitle>
+            <p />
+          </div>
+        </Col>
+      </Row>
+    </CardBody>
+    <CardFooter>
+      <hr />
+      <div className="stats">
+        <i className="far fa-calendar" /> Updated for Today
+      </div>
+    </CardFooter>
+  </Card>
+</Col>
+
           <Col lg="3" md="6" sm="6">
             <Card className="card-stats">
               <CardBody>
@@ -284,7 +383,13 @@ useEffect(() => {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Cleanest Generation</p>
-                      <CardTitle tag="p">In 3 hours</CardTitle>
+                      {cleanestGeneration ? (
+                        <CardTitle tag="p">
+                          {cleanestGeneration.bestTime}
+                        </CardTitle>
+                      ) : (
+                        <CardTitle tag="p">Loading...</CardTitle>
+                      )}
                       <p />
                     </div>
                   </Col>
@@ -293,7 +398,7 @@ useEffect(() => {
               <CardFooter>
                 <hr />
                 <div className="stats">
-                  <i className="fas fa-sync-alt" /> Update now
+                  <i className="far fa-calendar" /> Updated for Today
                 </div>
               </CardFooter>
             </Card>
@@ -301,28 +406,28 @@ useEffect(() => {
         </Row>
         <Row>
           <Col md="12">
-          <Card >
-            <CardHeader>
-             <CardTitle tag="h5">Generation Prediction</CardTitle>
+            <Card>
+              <CardHeader>
+                <CardTitle tag="h5">Generation Prediction</CardTitle>
                 <p className="card-category">24 Hours Forecast (MW)</p>
               </CardHeader>
               <CardBody>
-              {lineChartDataone.labels.length > 0 ? (
-                <Line
-                  id="lineChart"
-                  data={lineChartDataone}
-                  options={predictiongraph.options}
-                  width={600}
-                  length={100}
-                />
-              ) : (
-                <p>Loading line chart data...</p>
-              )}
+                {lineChartDataone.labels.length > 0 ? (
+                  <Line
+                    id="lineChart"
+                    data={lineChartDataone}
+                    options={predictiongraph.options}
+                    width={600}
+                    length={100}
+                  />
+                ) : (
+                  <p>Loading line chart data...</p>
+                )}
               </CardBody>
               <CardFooter>
                 <hr />
                 <div className="stats">
-                <i className="fa fa-history" /> Updated from CSV
+                  <i className="fa fa-history" /> Updated from CSV
                 </div>
               </CardFooter>
             </Card>
@@ -336,15 +441,15 @@ useEffect(() => {
                 <p className="card-category">Last Year's Performance (MW)</p>
               </CardHeader>
               <CardBody style={{ height: "430px" }}>
-              {pieChartData.labels.length > 0 ? (
-                <Pie id="pieChart" data={pieChartData} />
-              ) : (
-                <p>Loading pie chart data...</p>
-              )}
-              </CardBody> 
+                {pieChartData.labels.length > 0 ? (
+                  <Pie id="pieChart" data={pieChartData} />
+                ) : (
+                  <p>Loading pie chart data...</p>
+                )}
+              </CardBody>
               <CardFooter>
                 <div className="stats">
-                  <i i className="fa fa-history" /> Updated from CSV
+                  <i className="fa fa-history" /> Updated from CSV
                 </div>
               </CardFooter>
             </Card>
@@ -356,22 +461,21 @@ useEffect(() => {
                 <p className="card-category">24 Hour Forecast (MW)</p>
               </CardHeader>
               <CardBody>
-              {lineChartDatatwo.labels.length > 0 ? (
-                <Line
-                  id="lineChart"
-                  data={lineChartDatatwo}
-                  options={predictiongraph.options}
-                  height = "129px"
-                />
-              ) : (
-                <p>Loading line chart data...</p>
-              )}
+                {lineChartDatatwo.labels.length > 0 ? (
+                  <Line
+                    id="lineChart"
+                    data={lineChartDatatwo}
+                    options={predictiongraph.options}
+                    height="129px"
+                  />
+                ) : (
+                  <p>Loading line chart data...</p>
+                )}
               </CardBody>
               <CardFooter>
-
                 <hr />
                 <div className="card-stats">
-                  <i i className="fa fa-history" /> Updated from CSV
+                  <i className="fa fa-history" /> Updated from CSV
                 </div>
               </CardFooter>
             </Card>
@@ -383,4 +487,3 @@ useEffect(() => {
 }
 
 export default Dashboard;
-

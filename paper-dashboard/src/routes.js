@@ -1,28 +1,11 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-// routes.js
 
 import Dashboard from "views/Dashboard.js";
 import Notifications from "views/Notifications.js";
 import Devices from "views/Devices.js";
 import LoginPage from "views/Login.js";
 import UserPage from "views/User.js";
+import Logout from "views/Logout.js";
+
 
 const getRoutes = (isLoggedIn) => {
   // Common routes that are always visible
@@ -54,6 +37,13 @@ const getRoutes = (isLoggedIn) => {
     },
     {
       pro: true,
+      path: "/logout",
+      name: "Logout",
+      icon: "nc-icon nc-minimal-left",
+      component: <Logout />,
+      layout: "/admin",
+    },
+    {
       path: "/user-page",
       name: "User Profile",
       icon: "nc-icon nc-single-02",
