@@ -6,7 +6,7 @@ set -e
 branch="main"
 
 while true; do
-
+    
     # pull changes
     echo "Pulling latest changes from github on branch ${branch}..."
     git pull origin "${branch}"
@@ -20,6 +20,8 @@ while true; do
     # staging changes
     echo "Staging changes..."
     git add *
+    cd ..
+    git add *
 
     # commit changes
     echo "Committing changes..."
@@ -31,7 +33,5 @@ while true; do
 
     echo "Sleeping..."
     sleep 86400
-    
-    cd ..
 
 done
