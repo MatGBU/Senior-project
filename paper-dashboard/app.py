@@ -12,6 +12,7 @@ app = FastAPI()
 # Only allow the specific origin
 origins = [
     "http://ecostripsolutions.com",  # Your allowed frontend domain
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
@@ -48,7 +49,7 @@ def mil_to_min(time_str):
 
 # Function to turn on the device
 async def turn_on_device(input):
-    # print("Turning on")
+    print("Turning on")
     await strip.update()
     await strip.children[input].turn_on()
     # strip.children[input].modules['schedule'].data['get_rules']['rule_list']

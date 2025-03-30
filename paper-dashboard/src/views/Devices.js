@@ -1,6 +1,6 @@
-import React from "react";
-import axios from "axios"; // Import axios for making HTTP requests
-// reactstrap components
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
 import {
   Card,
   CardHeader,
@@ -9,299 +9,111 @@ import {
   Button,
   Row,
   Col,
+  Input,
 } from "reactstrap";
-
 import { FaPowerOff, FaClock, FaTrashAlt, FaPlus } from "react-icons/fa";
 
 function Devices() {
-  // Function to handle "Turn On" button click
-  const handleTurnOn = (input) => {
-    axios
-      .get(`https://fast-kid-sterling.ngrok-free.app/turn_on?input=${input}`, {
-        headers: {
-          "ngrok-skip-browser-warning": "69420",  // Custom header
-        },
-      })
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error turning on the device:", error);
-      });
-  };
+  const [baseUrl, setBaseUrl] = useState(Cookies.get("baseUrl") || ""); // Load from cookie
 
+  useEffect(() => {
+    Cookies.set("baseUrl", baseUrl, { expires: 7 }); // Save to cookie
+  }, [baseUrl]);
 
-  // Function to handle "Turn Off" button click
-  const handleTurnOff = (input) => {
+  const handleApiRequest = (endpoint, input) => {
+    if (!baseUrl) {
+      console.error("Base URL is empty. Please enter a valid URL.");
+      return;
+    }
     axios
-      .get(`https://fast-kid-sterling.ngrok-free.app/turn_off?input=${input}`, { 
-        headers: { 
-          "ngrok-skip-browser-warning": "69420", 
-        },
-      })  // FastAPI backend URL
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error turning off the device:", error);
-      });
-  };
-
-  const handleSchedule = (input) => {
-    axios
-      .get(`https://fast-kid-sterling.ngrok-free.app/schedule?input=${input}`, {
-        headers: {
-          "ngrok-skip-browser-warning": "69420", 
-        },
-      })  // FastAPI backend URL
-      .then((response) => {
-        console.log(response.data.status);  // Log the response message
-      })
-      .catch((error) => {
-        console.error("There was an error scheduling the device:", error);
-      });
-  }
-  const handleDeleteSchedule = (input) => {
-    axios
-      .get(`https://fast-kid-sterling.ngrok-free.app/delete_schedule?input=${input}`, {
+      .get(`${baseUrl}/${endpoint}?input=${input}`, {
         headers: {
           "ngrok-skip-browser-warning": "69420",
         },
-      })  // FastAPI backend URL
+      })
       .then((response) => {
-        console.log(response.data.status);  // Log the response message
+        console.log(response.data.status);
       })
       .catch((error) => {
-        console.error("There was an error scheduling the device:", error);
+        console.error(`Error with ${endpoint}:`, error);
       });
-  }
-  const handleTurnOnAll = () => {
-    // Turn on all outlets
-    handleTurnOn(0);
-    handleTurnOn(1);
-    handleTurnOn(2);
   };
-  
-  const handleTurnOffAll = () => {
-    // Turn off all outlets
-    handleTurnOff(0);
-    handleTurnOff(1);
-    handleTurnOff(2);
-  };
-  
-  const handleScheduleAll = () => {
-    // Schedule all outlets
-    handleSchedule(0);
-    handleSchedule(1);
-    handleSchedule(2);
-  };
-  
-  const handleDeleteScheduleAll = () => {
-    // Delete schedule for all outlets
-    handleDeleteSchedule(0);
-    handleDeleteSchedule(1);
-    handleDeleteSchedule(2);
-  };
-  
-  const handleAddNewDevice = () => {
-    // Logic for adding a new device
-    console.log("Add New Device button clicked");
-  };
-  
+
   return (
     <>
       <div className="content">
-        {/* Parent Card: Kasa Smart Power Strip */}
         <Card className="window-card">
+          <CardHeader>
+            <CardTitle tag="h4">Enter API Base URL</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <Input
+              type="text"
+              placeholder="Enter API Base URL..."
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+            />
+          </CardBody>
+        </Card>
+
+        <Card className="window-card mt-4">
           <CardHeader>
             <CardTitle tag="h4">Kasa Smart Wi-Fi Power Strip</CardTitle>
           </CardHeader>
           <CardBody>
-            {/* Global Buttons: Turn On, Turn Off, Schedule, Remove Schedule */}
             <Row className="mb-4">
               <Col md="3">
-                <Button color="success" block onClick={handleTurnOnAll} title="Turn On All Outlets">
+                <Button color="success" block onClick={() => handleApiRequest("turn_on", "all")}>
                   <FaPowerOff /> Turn On All
                 </Button>
               </Col>
               <Col md="3">
-                <Button color="danger" block onClick={handleTurnOffAll} title="Turn Off All Outlets">
+                <Button color="danger" block onClick={() => handleApiRequest("turn_off", "all")}>
                   <FaPowerOff /> Turn Off All
                 </Button>
               </Col>
               <Col md="3">
-                <Button color="primary" block onClick={handleScheduleAll} title="Schedule All Outlets">
+                <Button color="primary" block onClick={() => handleApiRequest("schedule", "all")}>
                   <FaClock /> Schedule All
                 </Button>
               </Col>
               <Col md="3">
-                <Button color="warning" block onClick={handleDeleteScheduleAll} title="Delete Schedule for All">
+                <Button color="warning" block onClick={() => handleApiRequest("delete_schedule", "all")}>
                   <FaTrashAlt /> Delete Schedule All
                 </Button>
               </Col>
             </Row>
-  
-            {/* Row for Outlet 1, Outlet 2, and Outlet 3 */}
+
             <Row>
-              {/* Outlet 1 */}
-              <Col md="4">
-                <Card className="outlet-card">
-                  <CardHeader>
-                    <CardTitle tag="h5">Outlet 1</CardTitle>
-                  </CardHeader>
-                  <CardBody>
-                    <Button
-                      color="success"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOn(0)}
-                      title="Turn On Outlet 1"
-                    >
-                      <FaPowerOff /> Turn On
-                    </Button>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOff(0)}
-                      title="Turn Off Outlet 1"
-                    >
-                      <FaPowerOff /> Turn Off
-                    </Button>
-                    <Button
-                      color="primary"
-                      size="sm"
-                      block
-                      onClick={() => handleSchedule(0)}
-                      title="Schedule Outlet 1"
-                    >
-                      <FaClock /> Schedule
-                    </Button>
-                    <Button
-                      color="warning"
-                      size="sm"
-                      block
-                      onClick={() => handleDeleteSchedule(0)}
-                      title="Delete Schedule Outlet 1"
-                    >
-                      <FaTrashAlt /> Delete Schedule
-                    </Button>
-                  </CardBody>
-                </Card>
-              </Col>
-  
-              {/* Outlet 2 */}
-              <Col md="4">
-                <Card className="outlet-card">
-                  <CardHeader>
-                    <CardTitle tag="h5">Outlet 2</CardTitle>
-                  </CardHeader>
-                  <CardBody>
-                    <Button
-                      color="success"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOn(1)}
-                      title="Turn On Outlet 2"
-                    >
-                      <FaPowerOff /> Turn On
-                    </Button>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOff(1)}
-                      title="Turn Off Outlet 2"
-                    >
-                      <FaPowerOff /> Turn Off
-                    </Button>
-                    <Button
-                      color="primary"
-                      size="sm"
-                      block
-                      onClick={() => handleSchedule(1)}
-                      title="Schedule Outlet 2"
-                    >
-                      <FaClock /> Schedule
-                    </Button>
-                    <Button
-                      color="warning"
-                      size="sm"
-                      block
-                      onClick={() => handleDeleteSchedule(1)}
-                      title="Delete Schedule Outlet 2"
-                    >
-                      <FaTrashAlt /> Delete Schedule
-                    </Button>
-                  </CardBody>
-                </Card>
-              </Col>
-  
-              {/* Outlet 3 */}
-              <Col md="4">
-                <Card className="outlet-card">
-                  <CardHeader>
-                    <CardTitle tag="h5">Outlet 3</CardTitle>
-                  </CardHeader>
-                  <CardBody>
-                    <Button
-                      color="success"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOn(2)}
-                      title="Turn On Outlet 3"
-                    >
-                      <FaPowerOff /> Turn On
-                    </Button>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      block
-                      onClick={() => handleTurnOff(2)}
-                      title="Turn Off Outlet 3"
-                    >
-                      <FaPowerOff /> Turn Off
-                    </Button>
-                    <Button
-                      color="primary"
-                      size="sm"
-                      block
-                      onClick={() => handleSchedule(2)}
-                      title="Schedule Outlet 3"
-                    >
-                      <FaClock /> Schedule
-                    </Button>
-                    <Button
-                      color="warning"
-                      size="sm"
-                      block
-                      onClick={() => handleDeleteSchedule(2)}
-                      title="Delete Schedule Outlet 3"
-                    >
-                      <FaTrashAlt /> Delete Schedule
-                    </Button>
-                  </CardBody>
-                </Card>
-              </Col>
+              {[0, 1, 2].map((outlet) => (
+                <Col md="4" key={outlet}>
+                  <Card className="outlet-card">
+                    <CardHeader>
+                      <CardTitle tag="h5">Outlet {outlet + 1}</CardTitle>
+                    </CardHeader>
+                    <CardBody>
+                      <Button color="success" size="sm" block onClick={() => handleApiRequest("turn_on", outlet)}>
+                        <FaPowerOff /> Turn On
+                      </Button>
+                      <Button color="danger" size="sm" block onClick={() => handleApiRequest("turn_off", outlet)}>
+                        <FaPowerOff /> Turn Off
+                      </Button>
+                      <Button color="primary" size="sm" block onClick={() => handleApiRequest("schedule", outlet)}>
+                        <FaClock /> Schedule
+                      </Button>
+                      <Button color="warning" size="sm" block onClick={() => handleApiRequest("delete_schedule", outlet)}>
+                        <FaTrashAlt /> Delete Schedule
+                      </Button>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))}
             </Row>
-          </CardBody>
-        </Card>
-  
-        {/* Add New Device Card */}
-        <Card className="window-card mt-4">
-          <CardHeader>
-            <CardTitle tag="h4">Add New Device</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <Button color="dark" block onClick={handleAddNewDevice} title="Add New Device">
-              <FaPlus /> Add New Device
-            </Button>
           </CardBody>
         </Card>
       </div>
     </>
   );
-
 }
 
 export default Devices;
