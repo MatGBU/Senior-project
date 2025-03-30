@@ -6,6 +6,8 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 
 import json, asyncio
+import requests
+import xml.etree.ElementTree as ET
 
 app = FastAPI()
 
@@ -122,6 +124,48 @@ async def delete_schedule_device(input):
     else:
         print(f"Error: {stderr.decode()}")
 
+async def pull_current_data():
+    URL = "https://webservices.iso-ne.com/api/v1.1/genfuelmix/current"
+    USERNAME = 'alean@bu.edu'
+    PASSWORD = 'Mq75eg8pxTBCEKY'
+
+    FUEL_CATEGORIES = [
+        'Coal', 'Hydro', 'Natural Gas', 'Nuclear', 'Oil', 'Other', 
+        'Landfill Gas', 'Refuse', 'Solar', 'Wind', 'Wood'
+    ]
+
+    async def fetch_fuelmix_data():
+        response = requests.get(URL, auth=(USERNAME, PASSWORD))
+        return response.content if response.status_code == 200 else None
+
+    async def parse_fuelmix_data(xml_data):
+        root = ET.fromstring(xml_data)
+        namespace = {'ns': 'http://WEBSERV.iso-ne.com'}
+        data = {}
+
+        for entry in root.findall('ns:GenFuelMix', namespace):
+            timestamp = entry.find('ns:BeginDate', namespace).text.replace('T', ' ')
+            timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f%z').strftime('%Y-%m-%d %H:%M:%S')
+            fuel_type = entry.find('ns:FuelCategory', namespace).text
+            gen_mw = float(entry.find('ns:GenMw', namespace).text)
+
+            if timestamp not in data:
+                data[timestamp] = {category: 0.0 for category in FUEL_CATEGORIES}
+            
+            if fuel_type in data[timestamp]:
+                data[timestamp][fuel_type] += gen_mw
+        
+        return data
+
+    xml_data = await fetch_fuelmix_data()
+    if xml_data:
+        fuel_data = await parse_fuelmix_data(xml_data)
+        return fuel_data
+        # Print formatted output
+        # for timestamp, values in fuel_data.items():
+            # print(f"{timestamp}: {values}")
+    else:
+        print("Failed to fetch data.")
 
 @app.get("/")
 async def root():
@@ -146,6 +190,12 @@ async def schedule(input: int):
 async def delete_schedule(input: int):
     await delete_schedule_device(input)
     return {"status": "off"}
+
+@app.get("/get_rt_data")
+async def get_rt_data():
+    data = await pull_current_data()
+    return data
+
 
 if __name__ == "__main__":
     import uvicorn
