@@ -117,16 +117,23 @@ function Devices() {
     }],
   };
 
+  const renewableSources = ["Hydro", "Landfill Gas", "Wind", "Solar", "Wood", "Refuse", "Nuclear"];
+  let totalGeneration = 0;
+  let renewableGeneration = 0;
+
   if (Object.keys(rtData).length > 0) {
     // Assuming you want to show data for the first timestamp (time)
     const firstTimestamp = Object.keys(rtData)[0];
     const data = rtData[firstTimestamp];
     chartData.labels = Object.keys(data); // Labels for the pie chart are the sources
     chartData.datasets[0].data = Object.values(data); // Data values are the generation (MW) values
-    chartData.datasets[0].backgroundColor = chartData.labels.map((_, idx) => colors[idx % colors.length]);   
+    chartData.datasets[0].backgroundColor = chartData.labels.map((_, idx) => colors[idx % colors.length]);
+    
+    totalGeneration = Object.values(data).reduce((sum, value) => sum + value, 0);
+    renewableGeneration = Object.entries(data).filter(([key]) => renewableSources.includes(key)).reduce((sum, [, value]) => sum + value, 0);
   }
 
-
+  const renewablePercentage = totalGeneration > 0 ? ((renewableGeneration / totalGeneration) * 100).toFixed(2) : 0;
 
   return (
     <>
@@ -194,28 +201,37 @@ function Devices() {
               <CardTitle tag="h4">Real-Time Energy Data</CardTitle>
             </CardHeader>
             <CardBody>
-              {/* Check if rtData is not empty */}
               {Object.keys(rtData).length === 0 ? (
-                <p>Loading data...</p> // If no data is present
+                <p>Loading data...</p> 
               ) : (
-                <Pie
-                  data={chartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      title: {
-                        display: true,
-                        text: `Real-Time Energy Generation (MW) - ${Object.keys(rtData)[0]}`,
-                      },
-                      legend: {
-                        position: 'top',
-                      },
-                    },
-                  }}
-                  width={500}  // Set the width of the pie chart
-                  height={500} 
-                />
+                <>
+                  {/* Pie Chart */}
+                  <div style={{ width: "100%", height: "400px" }}>
+                    <Pie
+                      data={chartData}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          title: {
+                            display: true,
+                            text: `Real-Time Energy Generation (MW) - ${Object.keys(rtData)[0]}`,
+                          },
+                          legend: {
+                            position: 'top',
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+
+                  {/* Energy Stats */}
+                  <div className="mt-4 text-center">
+                    <p><strong>Total Generation:</strong> {totalGeneration} MW</p>
+                    <p><strong>Renewable Generation:</strong> {renewableGeneration} MW</p>
+                    <p><strong>Renewable Percentage:</strong> {renewablePercentage}%</p>
+                  </div>
+                </>
               )}
             </CardBody>
           </Card>
