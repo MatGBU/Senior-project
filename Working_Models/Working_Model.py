@@ -126,7 +126,7 @@ def working_model():
     # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
         'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5) + pd.Timedelta(days = 1),
-        'Total Predicted' : testdata['Sum'],
+        'Total_Predicted' : testdata['Sum'],
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,
