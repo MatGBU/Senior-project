@@ -22,26 +22,37 @@ function Devices() {
   const [baseUrl, setBaseUrl] = useState(Cookies.get("baseUrl") || "");
   const [isValidUrl, setIsValidUrl] = useState(false);
   const [savedUrls, setSavedUrls] = useState(JSON.parse(Cookies.get("savedUrls") || "[]"));
-  const [isDeviceActive, setIsDeviceActive] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Function to validate URL format
-  const validateUrl = (url) => {
-    const urlPattern = /^(https?:\/\/)([\w-]+\.)+[\w-]+(\/.*)?$/;
-    return urlPattern.test(url);
+  const validateUrl = async (url) => {
+    try {
+      const response = await axios.get(`${url}/`, {
+        headers: { "ngrok-skip-browser-warning": "69420" }
+      });
+  
+      return response.status === 200;
+    } catch (error) {
+      console.error("Invalid API Base URL:", error);
+      return false;
+    }
   };
 
   const handleAddUrl = () => {
-    if (validateUrl(baseUrl) && !savedUrls.includes(baseUrl)) {
+    if (!savedUrls.includes(baseUrl)) {
       const newUrls = [...savedUrls, baseUrl];
       setSavedUrls(newUrls);
       Cookies.set("savedUrls", JSON.stringify(newUrls), { expires: 30 });
     }
   };
 
-  const handleUseDevice = () => {
-    if (validateUrl(baseUrl)) {
-      setIsDeviceActive(true);
+  const handleUseDevice = async () => {
+    setErrorMessage(""); // Reset error message
+    if (await validateUrl(baseUrl)) {
       setIsValidUrl(true);
+    } else {
+      setIsValidUrl(false);
+      setErrorMessage("Cannot connect to the device. Please check the URL.");
     }
   };
 
@@ -69,7 +80,6 @@ function Devices() {
   const handleBaseUrlChange = (e) => {
     const newUrl = e.target.value;
     setBaseUrl(newUrl);
-    setIsDeviceActive(false);
     setIsValidUrl(false);
     setRtData({});
   };
@@ -77,7 +87,7 @@ function Devices() {
   const [rtData, setRtData] = useState({});
 
   useEffect(() => {
-    if (isValidUrl && isDeviceActive) {
+    if (isValidUrl) {
       axios
         .get(`${baseUrl}/get_rt_data`, {
           headers: {
@@ -92,7 +102,7 @@ function Devices() {
           console.error("Error fetching real-time data:", error);
         });
     }
-  }, [isValidUrl, isDeviceActive, baseUrl]);
+  }, [isValidUrl, baseUrl]);
 
   const colors = [
     "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", 
@@ -147,9 +157,7 @@ function Devices() {
                 </Button>
               </Col>
             </Row>
-            {baseUrl && !validateUrl(baseUrl) && (
-              <p style={{ color: "red" }}>Invalid URL format. Use http://example.app</p>
-            )}
+            {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
           </CardBody>
         </Card>
 
@@ -180,7 +188,7 @@ function Devices() {
           </CardBody>
         </Card>
 
-        {isValidUrl && isDeviceActive && (
+        {isValidUrl && (
           <Card className="window-card mt-4">
             <CardHeader>
               <CardTitle tag="h4">Real-Time Energy Data</CardTitle>
@@ -215,7 +223,7 @@ function Devices() {
 
 
         {/* Power Strip Controls */}
-        {isValidUrl && isDeviceActive && (
+        {isValidUrl && (
           <Card className="window-card mt-4">
             <CardHeader>
               <CardTitle tag="h4">Kasa Smart Wi-Fi Power Strip</CardTitle>

@@ -169,7 +169,7 @@ async def pull_current_data():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the API!"}
+    return {"status": "valid"}
 
 @app.get("/turn_on")
 async def turn_on(input: int):
