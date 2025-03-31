@@ -40,18 +40,25 @@ function Dashboard() {
       try {
         const response = await fetch("/data/energy_predictions.csv");
         const csvText = await response.text();
-
+  
         // Parse the CSV assuming first row as header
         const rows = csvText.split("\n").map((row) => row.split(","));
         const headers = rows[0];
         const dataRows = rows.slice(1).filter((row) => row.length === headers.length);
-
+  
         const labels = dataRows.map((row) => row[0]); // Dates as labels
-        const hydroData = dataRows.map((row) => parseFloat(row[1]) || 0); // Hydro
-        const nuclearData = dataRows.map((row) => parseFloat(row[2]) || 0); // Nuclear
-        const windData = dataRows.map((row) => parseFloat(row[3]) || 0); // Wind
-        const solarData = dataRows.map((row) => parseFloat(row[4]) || 0); // Solar
-
+        const hydroData = dataRows.map((row) => parseFloat(row[2]) || 0); // Hydro
+        const nuclearData = dataRows.map((row) => parseFloat(row[3]) || 0); // Nuclear
+        const windData = dataRows.map((row) => parseFloat(row[4]) || 0); // Wind
+        const solarData = dataRows.map((row) => parseFloat(row[5]) || 0); // Solar
+        
+        // NEW: Combine Refuse (col 5) + Wood (col 6)
+        const otherData = dataRows.map((row) => {
+          const refuseVal = parseFloat(row[6]) || 0;
+          const woodVal = parseFloat(row[7]) || 0;
+          return refuseVal + woodVal;
+        });
+  
         setLineChartDataone({
           labels: labels,
           datasets: [
@@ -91,15 +98,25 @@ function Dashboard() {
               tension: 0.4,
               borderWidth: 3,
             },
+            // NEW DATASET for Refuse+Wood
+            {
+              label: "Other Renewables",
+              borderColor: "#9C27B0",
+              backgroundColor: "#9C27B0",
+              data: otherData,
+              fill: false,
+              tension: 0.4,
+              borderWidth: 3,
+            },
           ],
         });
       } catch (error) {
         console.error("Error loading line chart data:", error);
       }
     }
-
+  
     loadLineChartDataone();
-  }, []);
+  }, []);  
 
   // Fetch data for the Pie Chart
   useEffect(() => {
@@ -143,52 +160,90 @@ function Dashboard() {
     loadPieChartData();
   }, []);
 
-  // Fetch data for the second Line Chart
-  useEffect(() => {
-    async function loadLineChartDatatwo() {
-      try {
-        const response = await fetch("/data/energy_predictions.csv");
-        const csvText = await response.text();
+// Fetch data for the second Line Chart
+useEffect(() => {
+  async function loadLineChartDatatwo() {
+    try {
+      const response = await fetch("/data/energy_predictions.csv");
+      const csvText = await response.text();
 
-        // Parse the CSV
-        const rows = csvText.split("\n").map((row) => row.split(","));
-        const headers = rows[0];
-        const dataRows = rows.slice(1).filter((row) => row.length === headers.length);
-
-        const labels = dataRows.map((row) => row[0]); // Dates as labels
-        const refuseData = dataRows.map((row) => parseFloat(row[5]) || 0); // refuse
-        const woodData = dataRows.map((row) => parseFloat(row[6]) || 0); // wood
-
-        setLineChartDatatwo({
-          labels: labels,
-          datasets: [
-            {
-              label: "Refuse",
-              borderColor: "#6bd098",
-              backgroundColor: "#6bd098",
-              data: refuseData,
-              fill: false,
-              tension: 0.4,
-              borderWidth: 3,
-            },
-            {
-              label: "Wood",
-              borderColor: "#f17e5d",
-              backgroundColor: "#f17e5d",
-              data: woodData,
-              fill: false,
-              tension: 0.4,
-              borderWidth: 3,
-            },
-          ],
-        });
-      } catch (error) {
-        console.error("Error loading line chart data:", error);
+      // Parse the CSV
+      const rows = csvText.split("\n").map((row) => row.split(","));
+      if (rows.length < 2) {
+        console.warn("CSV has no data for the second chart.");
+        return;
       }
-    }
 
-    loadLineChartDatatwo();
-  }, []);
+      const headers = rows[0];
+      // Filter out rows that don't match the header length or have an empty date
+      const dataRows = rows.slice(1).filter(
+        (row) => row.length === headers.length && row[0].trim() !== ""
+      );
+
+      const labels = [];
+      const renewPercentData = [];
+      const nonRenewPercentData = [];
+
+      // For each row, calculate Renewables% vs. Non-Renewables%
+      dataRows.forEach((row) => {
+        const dateTime = row[0]; // BeginDate
+        labels.push(dateTime);
+
+        const total = parseFloat(row[1]) || 0;  // Total_Predicted
+
+        // Sum of renewables = Hydro + Nuclear + Wind + Solar + Refuse + Wood
+        const hydro = parseFloat(row[2]) || 0;
+        const nuclear = parseFloat(row[3]) || 0;
+        const wind = parseFloat(row[4]) || 0;
+        const solar = parseFloat(row[5]) || 0;
+        const refuse = parseFloat(row[6]) || 0;
+        const wood = parseFloat(row[7]) || 0;
+
+        const renewables = hydro + nuclear + wind + solar + refuse + wood;
+        const nonRenewables = total - renewables;
+
+        if (total === 0) {
+          // Avoid divide-by-zero
+          renewPercentData.push(0);
+          nonRenewPercentData.push(0);
+        } else {
+          renewPercentData.push((renewables / total) * 100);
+          nonRenewPercentData.push((nonRenewables / total) * 100);
+        }
+      });
+
+      // Now set the data for the second line chart
+      setLineChartDatatwo({
+        labels: labels,
+        datasets: [
+          {
+            label: "Renewables (%)",
+            data: renewPercentData,
+            borderColor: "#6bd098",
+            backgroundColor: "#6bd098",
+            fill: false,
+            tension: 0.4,
+            borderWidth: 3,
+          },
+          {
+            label: "Non-Renewables (%)",
+            data: nonRenewPercentData,
+            borderColor: "#f17e5d",
+            backgroundColor: "#f17e5d",
+            fill: false,
+            tension: 0.4,
+            borderWidth: 3,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Error loading line chart data:", error);
+    }
+  }
+
+  loadLineChartDatatwo();
+}, []);
+
 
   // New useEffect to calculate Cleanest Generation for the day and subsequent hours
 useEffect(() => {
@@ -220,10 +275,10 @@ useEffect(() => {
       let bestIndex = -1;
       let bestGeneration = -Infinity;
       todayRows.forEach((row, idx) => {
-        const hydro = parseFloat(row[1]) || 0;
-        const nuclear = parseFloat(row[2]) || 0;
-        const wind = parseFloat(row[3]) || 0;
-        const solar = parseFloat(row[4]) || 0;
+        const hydro = parseFloat(row[2]) || 0;
+        const nuclear = parseFloat(row[3]) || 0;
+        const wind = parseFloat(row[4]) || 0;
+        const solar = parseFloat(row[5]) || 0;
         const total = hydro + nuclear + wind + solar;
 
         if (total > bestGeneration) {
@@ -270,10 +325,10 @@ useEffect(() => {
       const todayRow = dataRows.find((row) => row[0].startsWith(today));
 
       if (todayRow) {
-        const hydro = parseFloat(todayRow[1]) || 0;
-        const nuclear = parseFloat(todayRow[2]) || 0;
-        const wind = parseFloat(todayRow[3]) || 0;
-        const solar = parseFloat(todayRow[4]) || 0;
+        const hydro = parseFloat(todayRow[2]) || 0;
+        const nuclear = parseFloat(todayRow[3]) || 0;
+        const wind = parseFloat(todayRow[4]) || 0;
+        const solar = parseFloat(todayRow[5]) || 0;
 
         // Sum renewable + nuclear generation
         const totalCleanGeneration = hydro + nuclear + wind + solar;
