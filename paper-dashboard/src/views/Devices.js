@@ -144,6 +144,73 @@ function Devices() {
 
   const renewablePercentage = totalGeneration > 0 ? ((renewableGeneration / totalGeneration) * 100).toFixed(2) : 0;
 
+  const [longestRenewablePeriod, setLongestRenewablePeriod] = useState("");
+
+  useEffect(() => {
+    const fetchCSV = async () => {
+      try {
+        const response = await fetch("/data/energy_predictions.csv");
+        const csvText = await response.text();
+
+        const rows = csvText.split("\n").map(row => row.split(","));
+        if (rows.length < 2) return;
+
+        const headers = rows[0];
+        const dataRows = rows.slice(1).filter(row => row.length === headers.length && row[0].trim() !== "");
+
+        const labels = [];
+        const renewPercentData = [];
+
+        dataRows.forEach(row => {
+          const dateTime = row[0]; 
+          labels.push(dateTime);
+
+          const total = parseFloat(row[1]) || 0;
+          const renewables = (parseFloat(row[2]) || 0) + (parseFloat(row[3]) || 0) + 
+                            (parseFloat(row[4]) || 0) + (parseFloat(row[5]) || 0) + 
+                            (parseFloat(row[6]) || 0) + (parseFloat(row[7]) || 0);
+
+          renewPercentData.push(total ? (renewables / total) * 100 : 0);
+        });
+
+        // === Finding Longest Renewable Period ===
+        let longestStart = null;
+        let longestEnd = null;
+        let maxDuration = 0;
+        let currentStart = null;
+        let currentDuration = 0;
+
+        for (let i = 0; i < renewPercentData.length; i++) {
+          if (renewPercentData[i] >= 50) {
+            if (currentStart === null) currentStart = labels[i];
+            currentDuration++;
+
+            if (currentDuration > maxDuration) {
+              maxDuration = currentDuration;
+              longestStart = currentStart;
+              longestEnd = labels[i];
+            }
+          } else {
+            currentStart = null;
+            currentDuration = 0;
+          }
+        }
+
+        const longestPeriodText = longestStart && longestEnd
+          ? `Longest Renewable Period: ${longestStart} to ${longestEnd} (${maxDuration} hours)`
+          : "No period found where renewables were 50% or more.";
+
+        setLongestRenewablePeriod(longestPeriodText);
+      } catch (error) {
+        console.error("Error fetching or processing CSV:", error);
+      }
+    };
+
+    fetchCSV();
+  }, []);
+
+  
+
   return (
     <>
       <div className="content">
@@ -246,6 +313,9 @@ function Devices() {
                       {renewablePercentage > 40 
                         ? "Ideal time to schedule load." 
                         : "Save your energy, there aren't enough renewables in the current mix."}
+                    </p>
+                    <p style={{ fontWeight: "bold", marginTop: "10px", color: "blue" }}>
+                      {longestRenewablePeriod}
                     </p>
                   </div>
                 </>
