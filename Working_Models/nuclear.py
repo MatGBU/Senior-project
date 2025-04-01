@@ -52,16 +52,16 @@ def nuclear_main():
     X_train = scalar.fit_transform(X_train)
     X_test = scalar.transform(X_test)
     model = tf.keras.models.Sequential([
-    #tf.keras.layers.Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
-    #tf.keras.layers.Dense(64, activation='relu'),
-    #tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1)
     ])
 
     model.compile(optimizer='adam', loss='mean_absolute_error')
 
-    history = model.fit(X_train, y_train, epochs=50, validation_split=0.15, batch_size=128)
+    history = model.fit(X_train, y_train, epochs=250, validation_split=0.15, batch_size=128)
 
     test_loss = model.evaluate(X_test, y_test)
     print(f'Test Loss: {test_loss}')
