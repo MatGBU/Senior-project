@@ -27,7 +27,7 @@ def nuclear_main():
     # Large computation 
     data['Previous_Year_Nuclear'] = data.apply(get_previous_year_Wind, axis=1, reference_df=nuclear_data)
 
-    cutoff_date = now - datetime.timedelta(days=1)
+    cutoff_date = now - datetime.timedelta(days=10)
     usable_data = data[data['BeginDate'] > cutoff_date].copy()
     solar_data2 = usable_data[['BeginDate', 'Nuclear','Previous_Day','Previous_2Day','Previous_Year']].copy()
     usable_data['Previous_Day_Nuclear'] = usable_data.apply(get_previous_day_Wind, axis=1, reference_df=solar_data2)
@@ -61,7 +61,7 @@ def nuclear_main():
 
     model.compile(optimizer='adam', loss='mean_absolute_error')
 
-    history = model.fit(X_train, y_train, epochs=250, validation_split=0.15, batch_size=128)
+    history = model.fit(X_train, y_train, epochs=450, validation_split=0.15, batch_size=128)
 
     test_loss = model.evaluate(X_test, y_test)
     print(f'Test Loss: {test_loss}')
