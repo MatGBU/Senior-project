@@ -97,8 +97,8 @@ def solar_main():
     scalar = StandardScaler()
     X_train = scalar.fit_transform(X_train)
     X_test = scalar.transform(X_test)
-    early_stopping = EarlyStopping(monitor='val_loss', patience=25, restore_best_weights=True)
-    lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=10, min_lr=1e-6)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=250, restore_best_weights=True)
+    lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=150, min_lr=1e-6)
     model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(512, kernel_regularizer=regularizers.l2(0.001),
                               input_shape=(X_train.shape[1],)),
@@ -130,7 +130,7 @@ def solar_main():
 
     model.compile(optimizer='adam', loss='mean_absolute_error')
 
-    history = model.fit(X_train, y_train, epochs=5000, validation_split=0.2, batch_size=128, callbacks=[early_stopping, lr_scheduler])
+    history = model.fit(X_train, y_train, epochs=15000, validation_split=0.2, batch_size=128, callbacks=[early_stopping, lr_scheduler])
 
     test_loss = model.evaluate(X_test, y_test)
 

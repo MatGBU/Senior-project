@@ -79,7 +79,7 @@ def wind_main():
     data['Previous_Year_Wind'] = data.apply(get_previous_year_Wind, axis=1, reference_df=wind_data)
 
     #cutoff_date = pd.to_datetime("2021-10-01").tz_localize(None)
-    cutoff_date = now - datetime.timedelta(days=30)
+    cutoff_date = now - datetime.timedelta(days=300)
     usable_data = data[data['BeginDate'] > cutoff_date].copy()
     wind_data2 = usable_data[['BeginDate', 
                             'Wind', 
@@ -108,12 +108,12 @@ def wind_main():
     X_test = scalar.transform(X_test)
 
     early_stopping = EarlyStopping(monitor='val_loss',
-                               patience=34,
+                               patience=104,
                                restore_best_weights=True)
 
     lr_scheduler = ReduceLROnPlateau(monitor='val_loss',
                                     facotr=0.5,
-                                    patience=10, 
+                                    patience=100, 
                                     min_le=1e-6)
     
     # model = tf.keras.models.Sequential([
@@ -166,7 +166,7 @@ def wind_main():
 
     history = model.fit(X_train, 
                         y_train, 
-                        epochs=500, 
+                        epochs=5000, 
                         validation_split=0.2, 
                         batch_size=128, 
                         callbacks=[early_stopping, lr_scheduler])
