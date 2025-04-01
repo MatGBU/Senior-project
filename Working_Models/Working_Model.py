@@ -122,7 +122,7 @@ def working_model():
     solarpredictions = pd.Series(np.array(solarpredictions).ravel())
     refusepredictions = pd.Series(np.array(refusepredictions).ravel())
     woodpredictions = pd.Series(np.array(woodpredictions).ravel())
-
+    # Create the prediction DataFrame
     output_df = pd.DataFrame({
         'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours=5) + pd.Timedelta(days=1),
         'HydroPredictions': hydropredictions,
@@ -133,21 +133,22 @@ def working_model():
         'WoodPredictions': woodpredictions
     })
 
-    # Compute the reverse-shifted timestamps to match testdata
-    output_df['join_key'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
+    # Create the join key inline (don't keep it in final CSV)
+    join_key = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
 
-    # Merge using join_key and then drop it after
+    # Merge to add 'Sum' from testdata based on original BeginDate
     final_df = output_df.merge(
         testdata[['BeginDate', 'Sum']],
-        left_on='join_key',
+        left_on=join_key,
         right_on='BeginDate',
         how='left'
-    ).drop(columns=['join_key', 'BeginDate_y'])
+    )
 
-    # Rename BeginDate_x back to BeginDate
-    final_df.rename(columns={'BeginDate_x': 'BeginDate'}, inplace=True)
-    # Write the DataFrame to a CSV file
+    # Clean up and rename columns
+    final_df.drop(columns=['BeginDate_y'], inplace=True)
+    final_df.rename(columns={'BeginDate_x': 'BeginDate', 'Sum': 'Total_Predicted'}, inplace=True)
+
+    # Save the correct DataFrame (NOT output_df) to CSV
     today_date = datetime.now().strftime('%Y-%m-%d')
     filename = f'../energy_predictions_{today_date}.csv'
-    # Save DataFrame to CSV
-    output_df.to_csv(filename, index=False)
+    final_df.to_csv(filename, index=False)
