@@ -402,6 +402,10 @@ function Devices() {
                             onClick={() => handleApiRequest("schedule", outlet, scheduleTimes[outlet]?.startDay, scheduleTimes[outlet]?.start, scheduleTimes[outlet]?.endDay, scheduleTimes[outlet]?.end)}>
                             <FaClock /> Schedule
                           </Button>
+                          <Button color="warning" size="sm" block 
+                            onClick={() => handleApiRequest("delete_schedule", outlet)}>
+                            <FaClock /> Delete Schedule
+                          </Button>
                       </CardBody>
                     </Card>
                   </Col>

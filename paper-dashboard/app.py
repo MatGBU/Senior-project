@@ -276,7 +276,7 @@ async def schedule(input: int, start_time: str, end_time: str, start_day: str, e
     return {"status": "off"}
 
 @app.get("/delete_schedule")
-async def delete_schedule(input: int, start_time: str, end_time: str):
+async def delete_schedule(input: int):
     await delete_schedule_device(input)
     return {"status": "off"}
 
