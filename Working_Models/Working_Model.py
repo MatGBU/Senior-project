@@ -44,7 +44,7 @@ def working_model():
     # Sort trainingdata by BeginDate to allow for efficient nearest date search
     trainingdata = trainingdata.sort_values('BeginDate').reset_index(drop=True)
 
-    # Initialize an empty list to store results
+    # Initialize an empty list to store resultsS
     results = []
 
     # Define a function to find the closest date
@@ -122,11 +122,10 @@ def working_model():
     solarpredictions = pd.Series(np.array(solarpredictions).ravel())
     refusepredictions = pd.Series(np.array(refusepredictions).ravel())
     woodpredictions = pd.Series(np.array(woodpredictions).ravel())
-    
+
     # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
         'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5) + pd.Timedelta(days = 1),
-        'Total_Predicted' : testdata['Sum'],
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,
@@ -134,7 +133,17 @@ def working_model():
         'RefusePredictions': refusepredictions,
         'WoodPredictions': woodpredictions
     })
+    output_df['OriginalBeginDate'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
 
+    # Now merge on this reconstructed timestamp
+    final_df = output_df.merge(
+    testdata[['BeginDate', 'Sum']],
+    left_on='OriginalBeginDate',
+    right_on='BeginDate',
+    how='left'
+    )
+    final_df.drop(columns=['OriginalBeginDate', 'BeginDate_y'], inplace=True)
+    final_df.rename(columns={'BeginDate_x': 'BeginDate'}, inplace=True)
     # Write the DataFrame to a CSV file
     today_date = datetime.now().strftime('%Y-%m-%d')
     filename = f'../energy_predictions_{today_date}.csv'

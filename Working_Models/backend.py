@@ -13,15 +13,15 @@ weather_csv = '../Year_weather.csv'
 fuel_csv = '../genfuelmix_aggregatedyear.csv'
 output_csv = '../AutoCombine.csv'
 def total_backend(): 
-    pullAllData(weather_csv, fuel_csv, output_csv)
-    gather_combine_testing()
-    hydro_main() 
-    landfill() 
-    nuclear_main() 
-    Refuse_main() 
-    solar_main() 
-    wind_main()
-    wood_main() 
+    #pullAllData(weather_csv, fuel_csv, output_csv)
+    #gather_combine_testing()
+    #hydro_main() 
+    #landfill() 
+    #nuclear_main() 
+    #Refuse_main() 
+    #solar_main() 
+    #wind_main()
+    #wood_main() 
     working_model()
 
 

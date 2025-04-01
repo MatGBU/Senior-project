@@ -3,8 +3,6 @@
 set -e
 
 # Define the branch
-echo "Sleeping..."
-sleep 44115
 branch="main"
 
 
