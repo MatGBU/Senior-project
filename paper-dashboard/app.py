@@ -168,9 +168,11 @@ async def schedule_device(input, start_time, end_time, start_day, end_day):
     await run_command(command_on)
     await run_command(command_off)
 
+    # await asyncio.sleep(0.2)
+
     end_time_obj = datetime.strptime(end_time, "%H:%M")
     delete_time_obj = end_time_obj + timedelta(minutes=1)
-    delete_time_str = delete_time_obj.strftime("%H:%M")
+    delete_time_str = delete_time_obj.strftime("%H:%M") + end_day
     delete_command = f'kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule'
 
     delete_rule_str_on = json.dumps({"id": command_ids[0]})
