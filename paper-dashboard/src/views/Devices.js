@@ -11,6 +11,7 @@ import {
   Col,
   Input,
   Table,
+  Label
 } from "reactstrap";
 import { FaPowerOff, FaClock, FaTrashAlt, FaPlus, FaCheck } from "react-icons/fa";
 import { Pie } from 'react-chartjs-2';
@@ -23,6 +24,7 @@ function Devices() {
   const [isValidUrl, setIsValidUrl] = useState(false);
   const [savedUrls, setSavedUrls] = useState(JSON.parse(Cookies.get("savedUrls") || "[]"));
   const [errorMessage, setErrorMessage] = useState("");
+  const [scheduleTimes, setScheduleTimes] = useState({});
 
   // Function to validate URL format
   const validateUrl = async (url) => {
@@ -56,19 +58,26 @@ function Devices() {
     }
   };
 
-  const handleApiRequest = (endpoint, input) => {
-    axios
-      .get(`${baseUrl}/${endpoint}?input=${input}`, {
-        headers: {
-          "ngrok-skip-browser-warning": "69420",
-        },
-      })
-      .then((response) => {
-        console.log(response.data.status);
-      })
-      .catch((error) => {
-        console.error(`Error with ${endpoint}:`, error);
-      });
+  const handleApiRequest = (endpoint, input, startTime = null, endTime = null) => {
+    let url = `${baseUrl}/${endpoint}?input=${input}`;
+    if (startTime && endTime) {
+      url += `&start_time=${startTime}&end_time=${endTime}`;
+    }
+    axios.get(url, {
+      headers: { "ngrok-skip-browser-warning": "69420" }
+    })
+    .then(response => console.log(response.data.status))
+    .catch(error => console.error(`Error with ${endpoint}:`, error));
+  };
+
+  const handleTimeChange = (outlet, type, event) => {
+    setScheduleTimes({
+      ...scheduleTimes,
+      [outlet]: {
+        ...scheduleTimes[outlet],
+        [type]: event.target.value
+      }
+    });
   };
 
   const handleDeleteUrl = (url) => {
@@ -281,7 +290,23 @@ function Devices() {
                         <Button color="danger" size="sm" block onClick={() => handleApiRequest("turn_off", outlet)}>
                           <FaPowerOff /> Turn Off
                         </Button>
-                        <Button color="primary" size="sm" block onClick={() => handleApiRequest("schedule", outlet)}>
+                        <Label for={`start-time-${outlet}`} className="mt-2">Start Time</Label>
+                        <Input
+                          id={`start-time-${outlet}`}
+                          type="time"
+                          value={scheduleTimes[outlet]?.start || ""}
+                          onChange={(e) => handleTimeChange(outlet, "start", e)}
+                          placeholder="Start Time"
+                        />
+                        <Label for={`end-time-${outlet}`} className="mt-2">End Time</Label>
+                        <Input
+                          id={`end-time-${outlet}`}
+                          type="time"
+                          value={scheduleTimes[outlet]?.end || ""}
+                          onChange={(e) => handleTimeChange(outlet, "end", e)}
+                          placeholder="End Time"
+                        />
+                        <Button color="primary" size="sm" block onClick={() => handleApiRequest("schedule", outlet, scheduleTimes[outlet]?.start, scheduleTimes[outlet]?.end)}>
                           <FaClock /> Schedule
                         </Button>
                         <Button color="warning" size="sm" block onClick={() => handleApiRequest("delete_schedule", outlet)}>

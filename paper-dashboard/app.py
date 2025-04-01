@@ -2,12 +2,15 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from kasa import SmartStrip
 from kasa import Module
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
 
 import json, asyncio
 import requests
 import xml.etree.ElementTree as ET
+import os
+import subprocess
+import shlex
 
 app = FastAPI()
 
@@ -68,13 +71,15 @@ async def turn_off_device(input):
     await strip.children[input].turn_off()
     await strip.update()  # Update device state after turning it off
 
-async def schedule_device(input):
-    command = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule add_rule "
+async def schedule_device(input, start_time, end_time):
+    command_add = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule add_rule "
+    # command_del = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{"id": }' "
+    command_ids = []
     
-    schedule_rule = {
+    schedule_rule_on = {
         "stime_opt": 0,
         "wday": [1, 1, 1, 1, 1, 1, 1],
-        "smin": mil_to_min("12:24"),
+        "smin": mil_to_min(start_time),
         "enable": 1,
         "repeat": 1,
         "etime_opt": -1,
@@ -87,26 +92,84 @@ async def schedule_device(input):
         "day": 0,
         "force": 0,
         "latitude": 0,
-        "emin": 0,
         "set_overall_enable": {"enable": 1}
     }
 
-    schedule_rule_str = json.dumps(schedule_rule)
+    schedule_rule_off = {
+        "stime_opt": 0,
+        "wday": [1, 1, 1, 1, 1, 1, 1],
+        "smin": mil_to_min(end_time),
+        "enable": 1,
+        "repeat": 1,
+        "etime_opt": -1,
+        "name": "lights on",
+        "eact": -1,
+        "month": 0,
+        "sact": 0,
+        "year": 0,
+        "longitude": 0,
+        "day": 0,
+        "force": 0,
+        "latitude": 0,
+        "set_overall_enable": {"enable": 1}
+    }
+
+    schedule_rule_on_str = json.dumps(schedule_rule_on)
+    schedule_rule_off_str = json.dumps(schedule_rule_off)
     
-    command += f"'{schedule_rule_str}'"
+    command_on = command_add + f"'{schedule_rule_on_str}'"
+    command_off = command_add + f"'{schedule_rule_off_str}'"
 
-    process = await asyncio.create_subprocess_shell(
-        command, 
-        stdout=asyncio.subprocess.PIPE, 
-        stderr=asyncio.subprocess.PIPE
-    )
+    async def run_command(cmd):
+        process = await asyncio.create_subprocess_shell(
+            cmd, 
+            stdout=asyncio.subprocess.PIPE, 
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
 
-    stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            output = stdout.decode().strip()
+            print(f"Command Output: {output}")
 
-    if process.returncode == 0:
-        print(f"Command Output: {stdout.decode()}")
-    else:
-        print(f"Error: {stderr.decode()}")
+            # Extract JSON response containing "id"
+            try:
+                json_output = json.loads(output.split("\n")[-1])  # Extract last JSON line
+                if "id" in json_output:
+                    command_ids.append(json_output["id"])
+                    return json_output["id"]
+            except json.JSONDecodeError:
+                print("Failed to parse JSON output.")
+        else:
+            print(f"Error: {stderr.decode().strip()}")
+
+    await run_command(command_on)
+    await run_command(command_off)
+
+    end_time_obj = datetime.strptime(end_time, "%H:%M")
+    delete_time_obj = end_time_obj + timedelta(minutes=1)
+    delete_time_str = delete_time_obj.strftime("%H:%M")
+    delete_command = f'kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule'
+
+    delete_rule_str_on = json.dumps({"id": command_ids[0]})
+    command_on = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_on)) + ' ' + shlex.quote("< $(tty)")} | at {shlex.quote(delete_time_str)}"
+    subprocess.run(command_on, shell=True, check=True)
+
+    delete_rule_str_off = json.dumps({"id": command_ids[0]})
+    command_off = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_off)) + ' ' + shlex.quote("< $(tty)")} | at {shlex.quote(delete_time_str)}"
+    subprocess.run(command_off, shell=True, check=True)
+
+
+
+
+    # delete_command_on = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{{\"id\": \"{command_ids[0]}\"}}' < $(tty)"
+    # subprocess.run(f'echo "{delete_command_on}" | at {delete_time_str}', shell=True)
+    # print(f'echo "{delete_command_on}" | at {delete_time_str}')
+    # print(f"Scheduled deletion for ON rule at {delete_time_str}.")
+
+    # delete_command_off = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{{\"id\": \"{command_ids[1]}\"}}' < $(tty)"
+    # subprocess.run(f'echo "{delete_command_off}" | at {delete_time_str}', shell=True)
+    # print(f"Scheduled deletion for OFF rule at {delete_time_str}.")
 
 async def delete_schedule_device(input):
     command = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_all_rules"
@@ -182,12 +245,13 @@ async def turn_off(input: int):
     return {"status": "off"}
 
 @app.get("/schedule")
-async def schedule(input: int):
-    await schedule_device(input)
+async def schedule(input: int, start_time: str, end_time: str):
+    print(start_time, end_time)
+    await schedule_device(input, start_time, end_time)
     return {"status": "off"}
 
 @app.get("/delete_schedule")
-async def delete_schedule(input: int):
+async def delete_schedule(input: int, start_time: str, end_time: str):
     await delete_schedule_device(input)
     return {"status": "off"}
 
