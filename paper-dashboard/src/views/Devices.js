@@ -58,10 +58,10 @@ function Devices() {
     }
   };
 
-  const handleApiRequest = (endpoint, input, startTime = null, endTime = null) => {
+  const handleApiRequest = (endpoint, input, startDay = null, startTime = null, endDay = null, endTime = null) => {
     let url = `${baseUrl}/${endpoint}?input=${input}`;
-    if (startTime && endTime) {
-      url += `&start_time=${startTime}&end_time=${endTime}`;
+    if (startDay && startTime && endDay && endTime) {
+      url += `&start_day=${startDay}&start_time=${startTime}&end_day=${endDay}&end_time=${endTime}`;
     }
     axios.get(url, {
       headers: { "ngrok-skip-browser-warning": "69420" }
@@ -368,28 +368,40 @@ function Devices() {
                         <Button color="danger" size="sm" block onClick={() => handleApiRequest("turn_off", outlet)}>
                           <FaPowerOff /> Turn Off
                         </Button>
-                        <Label for={`start-time-${outlet}`} className="mt-2">Start Time</Label>
-                        <Input
-                          id={`start-time-${outlet}`}
-                          type="time"
-                          value={scheduleTimes[outlet]?.start || ""}
-                          onChange={(e) => handleTimeChange(outlet, "start", e)}
-                          placeholder="Start Time"
-                        />
-                        <Label for={`end-time-${outlet}`} className="mt-2">End Time</Label>
-                        <Input
-                          id={`end-time-${outlet}`}
-                          type="time"
-                          value={scheduleTimes[outlet]?.end || ""}
-                          onChange={(e) => handleTimeChange(outlet, "end", e)}
-                          placeholder="End Time"
-                        />
-                        <Button color="primary" size="sm" block onClick={() => handleApiRequest("schedule", outlet, scheduleTimes[outlet]?.start, scheduleTimes[outlet]?.end)}>
-                          <FaClock /> Schedule
-                        </Button>
-                        <Button color="warning" size="sm" block onClick={() => handleApiRequest("delete_schedule", outlet)}>
-                          <FaTrashAlt /> Delete Schedule
-                        </Button>
+                        <Label>Start Day</Label>
+                          <Input
+                            type="select"
+                            value={scheduleTimes[outlet]?.startDay || ""}
+                            onChange={(e) => handleTimeChange(outlet, "startDay", e)}
+                          >
+                            <option>Today</option>
+                            <option>Tomorrow</option>
+                          </Input>
+                          <Label>Start Time</Label>
+                          <Input
+                            type="time"
+                            value={scheduleTimes[outlet]?.start || ""}
+                            onChange={(e) => handleTimeChange(outlet, "start", e)}
+                          />
+                          <Label>End Day</Label>
+                          <Input
+                            type="select"
+                            value={scheduleTimes[outlet]?.endDay || ""}
+                            onChange={(e) => handleTimeChange(outlet, "endDay", e)}
+                          >
+                            <option>Today</option>
+                            <option>Tomorrow</option>
+                          </Input>
+                          <Label>End Time</Label>
+                          <Input
+                            type="time"
+                            value={scheduleTimes[outlet]?.end || ""}
+                            onChange={(e) => handleTimeChange(outlet, "end", e)}
+                          />
+                          <Button color="primary" size="sm" block 
+                            onClick={() => handleApiRequest("schedule", outlet, scheduleTimes[outlet]?.startDay, scheduleTimes[outlet]?.start, scheduleTimes[outlet]?.endDay, scheduleTimes[outlet]?.end)}>
+                            <FaClock /> Schedule
+                          </Button>
                       </CardBody>
                     </Card>
                   </Col>

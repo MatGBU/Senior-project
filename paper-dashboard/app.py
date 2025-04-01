@@ -71,14 +71,34 @@ async def turn_off_device(input):
     await strip.children[input].turn_off()
     await strip.update()  # Update device state after turning it off
 
-async def schedule_device(input, start_time, end_time):
+async def schedule_device(input, start_time, end_time, start_day, end_day):
     command_add = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule add_rule "
     # command_del = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{"id": }' "
     command_ids = []
-    
+
+
+    # print(datetime.now().weekday())
+
+    def get_adjusted_wday(target_day):
+        """Returns a list where the target day is set to 1, and others are 0.
+        Adjusts so Sunday = 0, Monday = 1, ..., Saturday = 6.
+        """
+        current_day = (datetime.now().weekday() + 1) % 7  # Adjusted to match Sunday = 0
+        if target_day == "Today":
+            target_index = current_day
+        elif target_day == "Tomorrow":
+            target_index = (current_day + 1) % 7
+        else:
+            return [0] * 7  # Default to all zeros if input is invalid
+
+        return [1 if i == target_index else 0 for i in range(7)]
+
+    start_wday = get_adjusted_wday(start_day)
+    end_wday = get_adjusted_wday(end_day)
+
     schedule_rule_on = {
         "stime_opt": 0,
-        "wday": [1, 1, 1, 1, 1, 1, 1],
+        "wday": start_wday,
         "smin": mil_to_min(start_time),
         "enable": 1,
         "repeat": 1,
@@ -97,7 +117,7 @@ async def schedule_device(input, start_time, end_time):
 
     schedule_rule_off = {
         "stime_opt": 0,
-        "wday": [1, 1, 1, 1, 1, 1, 1],
+        "wday": end_wday,
         "smin": mil_to_min(end_time),
         "enable": 1,
         "repeat": 1,
@@ -113,6 +133,8 @@ async def schedule_device(input, start_time, end_time):
         "latitude": 0,
         "set_overall_enable": {"enable": 1}
     }
+
+    # print(schedule_rule_on)
 
     schedule_rule_on_str = json.dumps(schedule_rule_on)
     schedule_rule_off_str = json.dumps(schedule_rule_off)
@@ -248,9 +270,9 @@ async def turn_off(input: int):
     return {"status": "off"}
 
 @app.get("/schedule")
-async def schedule(input: int, start_time: str, end_time: str):
-    print(start_time, end_time)
-    await schedule_device(input, start_time, end_time)
+async def schedule(input: int, start_time: str, end_time: str, start_day: str, end_day: str):
+    print(start_time, end_time, start_day, end_day)
+    await schedule_device(input, start_time, end_time, start_day, end_day)
     return {"status": "off"}
 
 @app.get("/delete_schedule")
