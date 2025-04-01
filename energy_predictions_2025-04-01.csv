@@ -1,4 +1,4 @@
-BeginDate,HydroPredictions,NuclearPredictions,WindPredictions,SolarPredictions,RefusePredictions,WoodPredictions,OriginalBeginDate
+BeginDate,HydroPredictions,NuclearPredictions,WindPredictions,SolarPredictions,RefusePredictions,WoodPredictions,join_key
 2025-04-01 13:00:00,764.13617,6057.474,626.59906,113.854744,247.07484,226.09782,2025-03-31 18:00:00
 2025-04-01 14:00:00,802.77954,6044.4795,724.8962,117.18193,236.24545,231.7451,2025-03-31 19:00:00
 2025-04-01 15:00:00,727.1588,6054.454,755.0802,91.01688,234.2379,238.37975,2025-03-31 20:00:00

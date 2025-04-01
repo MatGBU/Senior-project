@@ -123,9 +123,8 @@ def working_model():
     refusepredictions = pd.Series(np.array(refusepredictions).ravel())
     woodpredictions = pd.Series(np.array(woodpredictions).ravel())
 
-    # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
-        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5) + pd.Timedelta(days = 1),
+        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours=5) + pd.Timedelta(days=1),
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,
@@ -133,16 +132,19 @@ def working_model():
         'RefusePredictions': refusepredictions,
         'WoodPredictions': woodpredictions
     })
-    output_df['OriginalBeginDate'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
 
-    # Now merge on this reconstructed timestamp
+    # Compute the reverse-shifted timestamps to match testdata
+    output_df['join_key'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
+
+    # Merge using join_key and then drop it after
     final_df = output_df.merge(
-    testdata[['BeginDate', 'Sum']],
-    left_on='OriginalBeginDate',
-    right_on='BeginDate',
-    how='left'
-    )
-    final_df.drop(columns=['OriginalBeginDate', 'BeginDate_y'], inplace=True)
+        testdata[['BeginDate', 'Sum']],
+        left_on='join_key',
+        right_on='BeginDate',
+        how='left'
+    ).drop(columns=['join_key', 'BeginDate_y'])
+
+    # Rename BeginDate_x back to BeginDate
     final_df.rename(columns={'BeginDate_x': 'BeginDate'}, inplace=True)
     # Write the DataFrame to a CSV file
     today_date = datetime.now().strftime('%Y-%m-%d')
