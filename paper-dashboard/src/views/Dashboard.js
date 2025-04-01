@@ -464,7 +464,7 @@ useEffect(() => {
             <Card>
               <CardHeader>
                 <CardTitle tag="h5">Generation Prediction</CardTitle>
-                <p className="card-category">24 Hours Forecast (MW)</p>
+                <p className="card-category">48 Hours Forecast (MW)</p>
               </CardHeader>
               <CardBody>
                 {lineChartDataone.labels.length > 0 ? (
@@ -513,7 +513,7 @@ useEffect(() => {
             <Card className="card-chart">
               <CardHeader>
                 <CardTitle tag="h5">Generation Prediction</CardTitle>
-                <p className="card-category">24 Hour Forecast (MW)</p>
+                <p className="card-category">48 Hour Forecast (MW)</p>
               </CardHeader>
               <CardBody>
                 {lineChartDatatwo.labels.length > 0 ? (
