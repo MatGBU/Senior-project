@@ -55,13 +55,6 @@ const getRoutes = (isLoggedIn) => {
   // Routes that are only visible to logged-out users
   const loggedOutRoutes = [
     {
-      path: "/devices",
-      name: "Devices",
-      icon: "nc-icon nc-app",
-      component: <Devices />,
-      layout: "/admin",
-    },
-    {
       path: "/login",
       name: "Login",
       icon: "nc-icon nc-lock-circle-open",
