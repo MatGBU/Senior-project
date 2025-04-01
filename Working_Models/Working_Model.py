@@ -134,14 +134,25 @@ def working_model():
         'WoodPredictions': woodpredictions
     })
 
-    # Compute join key (don't add to output_df)
-    join_key = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
+    # Create the join key by reversing the timestamp adjustment
+    output_df['join_key'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
 
-    # Merge and keep only shifted BeginDate
-    final_df = output_df.copy()
-    final_df['Total_Predicted'] = testdata.set_index('BeginDate').reindex(join_key)['Sum'].values
+    # Merge with the original data
+    final_df = output_df.merge(
+        testdata[['BeginDate', 'Sum']],
+        left_on='join_key',
+        right_on='BeginDate',
+        how='left'
+    )
 
-    # Save final_df to CSV
+    # Clean up columns
+    final_df = final_df.drop(columns=['join_key', 'BeginDate_y'])  # Drop the temporary key and duplicate column
+    final_df = final_df.rename(columns={
+        'BeginDate_x': 'BeginDate',
+        'Sum': 'Total_Predicted'
+    })
+
+    # Save to CSV
     today_date = datetime.now().strftime('%Y-%m-%d')
     filename = f'../energy_predictions_{today_date}.csv'
     final_df.to_csv(filename, index=False)
