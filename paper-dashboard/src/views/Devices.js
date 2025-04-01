@@ -239,6 +239,14 @@ function Devices() {
                     <p><strong>Total Generation:</strong> {totalGeneration} MW</p>
                     <p><strong>Renewable Generation:</strong> {renewableGeneration} MW</p>
                     <p><strong>Renewable Percentage:</strong> {renewablePercentage}%</p>
+                    <p style={{ 
+                        fontWeight: "bold", 
+                        color: renewablePercentage > 40 ? "green" : "red" 
+                      }}>
+                      {renewablePercentage > 40 
+                        ? "Ideal time to schedule load." 
+                        : "Save your energy, there aren't enough renewables in the current mix."}
+                    </p>
                   </div>
                 </>
               )}
