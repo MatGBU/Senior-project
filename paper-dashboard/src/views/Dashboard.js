@@ -329,9 +329,11 @@ useEffect(() => {
         const nuclear = parseFloat(todayRow[3]) || 0;
         const wind = parseFloat(todayRow[4]) || 0;
         const solar = parseFloat(todayRow[5]) || 0;
+        const refuse = parseFloat(todayRow[6]) || 0;
+        const wood = parseFloat(todayRow[7]) || 0;
 
         // Sum renewable + nuclear generation
-        const totalCleanGeneration = hydro + nuclear + wind + solar;
+        const totalCleanGeneration = hydro + nuclear + wind + solar + refuse + wood;
         setTodaysGeneration(totalCleanGeneration);
       }
     } catch (error) {
