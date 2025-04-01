@@ -27,7 +27,7 @@ def nuclear_main():
     # Large computation 
     data['Previous_Year_Nuclear'] = data.apply(get_previous_year_Wind, axis=1, reference_df=nuclear_data)
 
-    cutoff_date = now - datetime.timedelta(days=14)
+    cutoff_date = now - datetime.timedelta(days=2)
     usable_data = data[data['BeginDate'] > cutoff_date].copy()
     solar_data2 = usable_data[['BeginDate', 'Nuclear','Previous_Day','Previous_2Day','Previous_Year']].copy()
     usable_data['Previous_Day_Nuclear'] = usable_data.apply(get_previous_day_Wind, axis=1, reference_df=solar_data2)
