@@ -44,7 +44,7 @@ def working_model():
     # Sort trainingdata by BeginDate to allow for efficient nearest date search
     trainingdata = trainingdata.sort_values('BeginDate').reset_index(drop=True)
 
-    # Initialize an empty list to store resultsS
+    # Initialize an empty list to store results
     results = []
 
     # Define a function to find the closest date
@@ -123,9 +123,10 @@ def working_model():
     refusepredictions = pd.Series(np.array(refusepredictions).ravel())
     woodpredictions = pd.Series(np.array(woodpredictions).ravel())
     
-    # Create the shifted prediction DataFrame
+    # Create the DataFrame with BeginDate and all predictions
     output_df = pd.DataFrame({
-        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours=5) + pd.Timedelta(days=1),
+        'BeginDate': testdata['BeginDate'] - pd.Timedelta(hours = 5) + pd.Timedelta(days = 1),
+        'Total_Predicted' : testdata['Sum'],
         'HydroPredictions': hydropredictions,
         'NuclearPredictions': nuclearpredictions,
         'WindPredictions': windpredictions,
@@ -134,25 +135,8 @@ def working_model():
         'WoodPredictions': woodpredictions
     })
 
-    # Create the join key by reversing the timestamp adjustment
-    output_df['join_key'] = output_df['BeginDate'] + pd.Timedelta(hours=5) - pd.Timedelta(days=1)
-
-    # Merge with the original data
-    final_df = output_df.merge(
-        testdata[['BeginDate', 'Sum']],
-        left_on='join_key',
-        right_on='BeginDate',
-        how='left'
-    )
-
-    # Clean up columns
-    final_df = final_df.drop(columns=['join_key', 'BeginDate_y'])  # Drop the temporary key and duplicate column
-    final_df = final_df.rename(columns={
-        'BeginDate_x': 'BeginDate',
-        'Sum': 'Total_Predicted'
-    })
-
-    # Save to CSV
+    # Write the DataFrame to a CSV file
     today_date = datetime.now().strftime('%Y-%m-%d')
     filename = f'../energy_predictions_{today_date}.csv'
-    final_df.to_csv(filename, index=False)
+    # Save DataFrame to CSV
+    output_df.to_csv(filename, index=False)
