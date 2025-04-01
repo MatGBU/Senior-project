@@ -152,12 +152,15 @@ async def schedule_device(input, start_time, end_time):
     delete_command = f'kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule'
 
     delete_rule_str_on = json.dumps({"id": command_ids[0]})
-    command_on = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_on)) + ' ' + shlex.quote("< $(tty)")} | at {shlex.quote(delete_time_str)}"
-    subprocess.run(command_on, shell=True, check=True)
+    command_on = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_on))} | at {shlex.quote(delete_time_str)}"
+    # subprocess.run(command_on, shell=True, check=True)
 
-    delete_rule_str_off = json.dumps({"id": command_ids[0]})
-    command_off = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_off)) + ' ' + shlex.quote("< $(tty)")} | at {shlex.quote(delete_time_str)}"
-    subprocess.run(command_off, shell=True, check=True)
+    delete_rule_str_off = json.dumps({"id": command_ids[1]})
+    command_off = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_off))} | at {shlex.quote(delete_time_str)}"
+    # subprocess.run(command_off, shell=True, check=True)
+
+    await run_command(command_on)
+    await run_command(command_off)
 
 
 
