@@ -30,7 +30,6 @@ app.add_middleware(
 
 # DEVICE_IP = "192.168.0.133"  # Replace with your actual device IP
 # strip = SmartStrip(DEVICE_IP)
-DEVICE_IP = None
 strip = None
 
 ### Important commands
@@ -76,7 +75,7 @@ async def turn_off_device(input):
     await strip.update()  # Update device state after turning it off
 
 async def schedule_device(input, start_time, end_time, start_day, end_day):
-    global DEVICE_IP
+    DEVICE_IP = os.environ.get("DEVICE_IP")
     command_add = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule add_rule "
     command_ids = []
 
@@ -182,7 +181,7 @@ async def schedule_device(input, start_time, end_time, start_day, end_day):
     await run_command(command_off)
 
 async def delete_schedule_device(input):
-    global DEVICE_IP
+    DEVICE_IP = os.environ.get("DEVICE_IP")
     command = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule delete_all_rules"
 
     process = await asyncio.create_subprocess_shell(
@@ -273,11 +272,13 @@ async def get_rt_data():
 
 @app.on_event("startup")
 async def startup_event():
-    global strip, DEVICE_IP
+    global strip
+
+    DEVICE_IP = os.environ.get("DEVICE_IP")
 
     if DEVICE_IP is None:
         raise RuntimeError("DEVICE_IP not set. Please provide it via command-line argument.")
-
+    
     strip = SmartStrip(DEVICE_IP)
     await strip.update()
 
@@ -285,11 +286,10 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     import argparse
-
     parser = argparse.ArgumentParser(description="FastAPI SmartStrip Controller")
     parser.add_argument("--device-ip", required=True, help="IP address of the Smart Strip")
     args = parser.parse_args()
 
-    DEVICE_IP = args.device_ip
+    DEVICE_IP = os.environ.get("DEVICE_IP")
 
     uvicorn.run(app, host="0.0.0.0", port=5001, log_level="info")
