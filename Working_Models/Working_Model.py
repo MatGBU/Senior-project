@@ -88,7 +88,7 @@ def working_model():
     combined_data['Day'] = combined_data['BeginDate'].dt.day
     combined_data['WindSpeedCubed'] = combined_data['windspeed'] ** 3
     inputdatahydro = combined_data[['Month','Previous_Day_Hydro','Previous_2Day_Hydro','Sum','Hour_of_Day','Previous_Year_Hydro','solarradiation','Year','precip','humidity','temp','dew','snow','snowdepth','windspeed','sealevelpressure','cloudcover','severerisk']]
-    inputdatanuclear = combined_data[['Month','Day','Previous_2Day_Nuclear','Sum','Hour_of_Day']]
+    inputdatanuclear = combined_data[['Previous_Day_Nuclear','Sum',]]
     inputdatawind = combined_data[['WindSpeedCubed','Month','Year','Previous_Year_Wind','Previous_2Day_Wind','Sum','snowdepth','temp','solarenergy','sealevelpressure', 'humidity','solarenergy','snow', 'precip', 'uvindex', 'cloudcover', 'Previous_Day_Wind','Hour_of_Day','dew','windgust','windspeed','winddir']]
     inputdatasolar = combined_data[['Month','Year','Previous_Year_Solar','Previous_2Day_Solar','temp', 'humidity', 'precip', 'uvindex', 'cloudcover', 'solarradiation','Previous_Day_Solar','solarenergy','Hour_of_Day','dew','dew','snow','snowdepth','windspeed','windgust']]
     inputdatawood = combined_data[['Previous_Day_Wood','Month','Previous_2Day_Wood','Sum','Hour_of_Day','Previous_Year_Wood','solarradiation','Year','precip','humidity','temp','dew','snow','snowdepth','windspeed','sealevelpressure','cloudcover','severerisk']]
