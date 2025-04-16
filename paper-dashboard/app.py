@@ -56,6 +56,7 @@ def mil_to_min(time_str):
 
 # Function to turn on the device
 async def turn_on_device(input):
+    global strip
     print("Turning on")
     await strip.update()
     await strip.children[input].turn_on()
@@ -68,6 +69,7 @@ async def turn_on_device(input):
 
 # Function to turn off the device
 async def turn_off_device(input):
+    global strip
     print("Turning off")
     await strip.update()
     await strip.children[input].turn_off()
