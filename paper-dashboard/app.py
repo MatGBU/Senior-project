@@ -76,6 +76,7 @@ async def turn_off_device(input):
     await strip.update()  # Update device state after turning it off
 
 async def schedule_device(input, start_time, end_time, start_day, end_day):
+    global DEVICE_IP
     command_add = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule add_rule "
     command_ids = []
 
@@ -181,6 +182,7 @@ async def schedule_device(input, start_time, end_time, start_day, end_day):
     await run_command(command_off)
 
 async def delete_schedule_device(input):
+    global DEVICE_IP
     command = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule delete_all_rules"
 
     process = await asyncio.create_subprocess_shell(
