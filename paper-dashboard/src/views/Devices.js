@@ -35,7 +35,7 @@ function Devices() {
   
       return response.status === 200;
     } catch (error) {
-      console.error("Invalid API Base URL:", error);
+      console.error("Invalid Device Address:", error);
       return false;
     }
   };
@@ -217,14 +217,14 @@ function Devices() {
         {/* Base URL Input */}
         <Card className="window-card">
           <CardHeader>
-            <CardTitle tag="h4">Enter API Base URL</CardTitle>
+            <CardTitle tag="h4">Enter Device Address</CardTitle>
           </CardHeader>
           <CardBody>
             <Row className="align-items-center">
               <Col md="7">
                 <Input
                   type="text"
-                  placeholder="Enter API Base URL..."
+                  placeholder="Enter Device Address..."
                   value={baseUrl}
                   onChange={handleBaseUrlChange}
                 />
@@ -247,7 +247,7 @@ function Devices() {
         {/* Saved Base URLs */}
         <Card className="window-card mt-4">
           <CardHeader>
-            <CardTitle tag="h4">Saved Base URLs</CardTitle>
+            <CardTitle tag="h4">Saved Device Adresses</CardTitle>
           </CardHeader>
           <CardBody>
             {savedUrls.length > 0 ? (
