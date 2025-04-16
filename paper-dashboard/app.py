@@ -28,8 +28,9 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-DEVICE_IP = "192.168.0.133"  # Replace with your actual device IP
-strip = SmartStrip(DEVICE_IP)
+# DEVICE_IP = "192.168.0.133"  # Replace with your actual device IP
+# strip = SmartStrip(DEVICE_IP)
+strip = None
 
 ### Important commands
 
@@ -54,6 +55,7 @@ def mil_to_min(time_str):
 
 # Function to turn on the device
 async def turn_on_device(input):
+    global strip
     print("Turning on")
     await strip.update()
     await strip.children[input].turn_on()
@@ -66,18 +68,16 @@ async def turn_on_device(input):
 
 # Function to turn off the device
 async def turn_off_device(input):
+    global strip
     print("Turning off")
     await strip.update()
     await strip.children[input].turn_off()
     await strip.update()  # Update device state after turning it off
 
 async def schedule_device(input, start_time, end_time, start_day, end_day):
-    command_add = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule add_rule "
-    # command_del = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{"id": }' "
+    DEVICE_IP = os.environ.get("DEVICE_IP")
+    command_add = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule add_rule "
     command_ids = []
-
-
-    # print(datetime.now().weekday())
 
     def get_adjusted_wday(target_day):
         """Returns a list where the target day is set to 1, and others are 0.
@@ -134,8 +134,6 @@ async def schedule_device(input, start_time, end_time, start_day, end_day):
         "set_overall_enable": {"enable": 1}
     }
 
-    # print(schedule_rule_on)
-
     schedule_rule_on_str = json.dumps(schedule_rule_on)
     schedule_rule_off_str = json.dumps(schedule_rule_off)
     
@@ -168,38 +166,23 @@ async def schedule_device(input, start_time, end_time, start_day, end_day):
     await run_command(command_on)
     await run_command(command_off)
 
-    # await asyncio.sleep(0.2)
-
     end_time_obj = datetime.strptime(end_time, "%H:%M")
     delete_time_obj = end_time_obj + timedelta(minutes=1)
     delete_time_str = delete_time_obj.strftime("%H:%M") + end_day
-    delete_command = f'kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule'
+    delete_command = f'kasa --host {DEVICE_IP} command --child-index {input} --module schedule delete_rule'
 
     delete_rule_str_on = json.dumps({"id": command_ids[0]})
     command_on = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_on))} | at {shlex.quote(delete_time_str)}"
-    # subprocess.run(command_on, shell=True, check=True)
 
     delete_rule_str_off = json.dumps({"id": command_ids[1]})
     command_off = f"echo {shlex.quote(delete_command + ' ' + shlex.quote(delete_rule_str_off))} | at {shlex.quote(delete_time_str)}"
-    # subprocess.run(command_off, shell=True, check=True)
 
     await run_command(command_on)
     await run_command(command_off)
 
-
-
-
-    # delete_command_on = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{{\"id\": \"{command_ids[0]}\"}}' < $(tty)"
-    # subprocess.run(f'echo "{delete_command_on}" | at {delete_time_str}', shell=True)
-    # print(f'echo "{delete_command_on}" | at {delete_time_str}')
-    # print(f"Scheduled deletion for ON rule at {delete_time_str}.")
-
-    # delete_command_off = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_rule '{{\"id\": \"{command_ids[1]}\"}}' < $(tty)"
-    # subprocess.run(f'echo "{delete_command_off}" | at {delete_time_str}', shell=True)
-    # print(f"Scheduled deletion for OFF rule at {delete_time_str}.")
-
 async def delete_schedule_device(input):
-    command = f"kasa --host 192.168.0.133 command --child-index {input} --module schedule delete_all_rules"
+    DEVICE_IP = os.environ.get("DEVICE_IP")
+    command = f"kasa --host {DEVICE_IP} command --child-index {input} --module schedule delete_all_rules"
 
     process = await asyncio.create_subprocess_shell(
         command, 
@@ -287,7 +270,26 @@ async def get_rt_data():
     data = await pull_current_data()
     return data
 
+@app.on_event("startup")
+async def startup_event():
+    global strip
+
+    DEVICE_IP = os.environ.get("DEVICE_IP")
+
+    if DEVICE_IP is None:
+        raise RuntimeError("DEVICE_IP not set. Please provide it via command-line argument.")
+    
+    strip = SmartStrip(DEVICE_IP)
+    await strip.update()
+
 
 if __name__ == "__main__":
     import uvicorn
+    import argparse
+    parser = argparse.ArgumentParser(description="FastAPI SmartStrip Controller")
+    parser.add_argument("--device-ip", required=True, help="IP address of the Smart Strip")
+    args = parser.parse_args()
+
+    DEVICE_IP = os.environ.get("DEVICE_IP")
+
     uvicorn.run(app, host="0.0.0.0", port=5001, log_level="info")
