@@ -4,7 +4,7 @@
 - Avishai Lean | Electrical Engineering
 - Benjamin Axline | Computer Engineering
 - Mateusz Górczak | Electrical Engineering
-- Konstantin Agrchev | Computer Engineering
+- Konstantin Agrachev | Computer Engineering
 
 ## Current Project State
 This project combines real-time energy monitoring with smart device control using Kasa SmartStrip devices.
