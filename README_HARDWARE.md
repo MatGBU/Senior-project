@@ -98,10 +98,3 @@ graph TD
 2. Network connectivity issues
 3. Device reset instructions
 
-## Enclosure Specifications
-
-- **Type**: Standard power strip enclosure
-- **Material**: Fire-resistant plastic
-- **Dimensions**: [Insert dimensions]
-- **Ventilation**: Passive cooling
-- **IP Rating**: Indoor use only
