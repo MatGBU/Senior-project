@@ -328,4 +328,4 @@ def write_to_csv(data, filename, append=False):
                 writer.writerow(row)
 
 
-pullAllData("../Year_weather.csv", "../genfuelmix_aggregatedyear.csv", "../AutoCombine.csv")
+#pullAllData("../Year_weather.csv", "../genfuelmix_aggregatedyear.csv", "../AutoCombine.csv")

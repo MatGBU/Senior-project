@@ -1,4 +1,6 @@
 from pullAllData import pullAllData
+import pandas as pd
+from datetime import datetime, timedelta
 weather_csv = '../Year_weather.csv'
 fuel_csv = '../genfuelmix_aggregatedyear.csv'
 output_csv = '../AutoCombine.csv'
@@ -6,7 +8,7 @@ pullAllData(weather_csv, fuel_csv, output_csv)
 # Columns in predictions BeginDate,Total_Predicted,HydroPredictions,NuclearPredictions,WindPredictions,SolarPredictions,RefusePredictions,WoodPredictions
 #  Columns in Autocombine BeginDate,Coal,Hydro,Natural Gas,Nuclear,Oil,Other,Landfill Gas,Refuse,Solar,Wind,Wood
 # Load the CSV
-df = pd.read_csv("AutoCombine.csv")
+df = pd.read_csv("../AutoCombine.csv")
 
 # Convert BeginDate to datetime format (in case it's not)
 df['BeginDate'] = pd.to_datetime(df['BeginDate'])
