@@ -209,6 +209,25 @@ function Devices() {
     fetchCSV();
   }, []);
 
+  useEffect(() => {
+    setScheduleTimes((prev) => {
+      const updated = { ...prev };
+  
+      [0, 1, 2].forEach((outlet) => {
+        if (!updated[outlet]) {
+          updated[outlet] = { startDay: "Today", endDay: "Today" };
+        } else {
+          updated[outlet] = {
+            ...updated[outlet],
+            startDay: updated[outlet].startDay || "Today",
+            endDay: updated[outlet].endDay || "Today",
+          };
+        }
+      });
+  
+      return updated;
+    });
+  }, []);
   
 
   return (
@@ -332,28 +351,6 @@ function Devices() {
               <CardTitle tag="h4">Kasa Smart Wi-Fi Power Strip</CardTitle>
             </CardHeader>
             <CardBody>
-              <Row className="mb-4">
-                <Col md="3">
-                  <Button color="success" block onClick={() => handleApiRequest("turn_on", "all")}>
-                    <FaPowerOff /> Turn On All
-                  </Button>
-                </Col>
-                <Col md="3">
-                  <Button color="danger" block onClick={() => handleApiRequest("turn_off", "all")}>
-                    <FaPowerOff /> Turn Off All
-                  </Button>
-                </Col>
-                <Col md="3">
-                  <Button color="primary" block onClick={() => handleApiRequest("schedule", "all")}>
-                    <FaClock /> Schedule All
-                  </Button>
-                </Col>
-                <Col md="3">
-                  <Button color="warning" block onClick={() => handleApiRequest("delete_schedule", "all")}>
-                    <FaTrashAlt /> Delete Schedule All
-                  </Button>
-                </Col>
-              </Row>
               <Row>
                 {[0, 1, 2].map((outlet) => (
                   <Col md="4" key={outlet}>
@@ -371,7 +368,7 @@ function Devices() {
                         <Label>Start Day</Label>
                           <Input
                             type="select"
-                            value={scheduleTimes[outlet]?.startDay || ""}
+                            value={scheduleTimes[outlet]?.startDay || "Today"}
                             onChange={(e) => handleTimeChange(outlet, "startDay", e)}
                           >
                             <option>Today</option>
@@ -386,7 +383,7 @@ function Devices() {
                           <Label>End Day</Label>
                           <Input
                             type="select"
-                            value={scheduleTimes[outlet]?.endDay || ""}
+                            value={scheduleTimes[outlet]?.endDay || "Today"}
                             onChange={(e) => handleTimeChange(outlet, "endDay", e)}
                           >
                             <option>Today</option>

@@ -286,9 +286,6 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     import argparse
-    parser = argparse.ArgumentParser(description="FastAPI SmartStrip Controller")
-    parser.add_argument("--device-ip", required=True, help="IP address of the Smart Strip")
-    args = parser.parse_args()
 
     DEVICE_IP = os.environ.get("DEVICE_IP")
 
