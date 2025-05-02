@@ -12,6 +12,7 @@ df = pd.read_csv("../AutoCombine.csv")
 
 # Convert BeginDate to datetime format (in case it's not)
 df['BeginDate'] = pd.to_datetime(df['BeginDate'])
+df['BeginDate'] = df['BeginDate'] - timedelta(hours=5)
 
 # Get today's date
 today = pd.to_datetime(datetime.today().date())

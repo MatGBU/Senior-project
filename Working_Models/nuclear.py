@@ -35,7 +35,6 @@ def nuclear_main():
 
     usable_data['Hour_of_Day'] = usable_data['BeginDate'].dt.hour
     usable_data['Year'] = usable_data['BeginDate'].dt.year
-    usable_data['Month'] = usable_data['BeginDate'].dt.month
     usable_data['Day'] = usable_data['BeginDate'].dt.day
     features = usable_data[['Previous_Day_Nuclear','Sum',]]
 
