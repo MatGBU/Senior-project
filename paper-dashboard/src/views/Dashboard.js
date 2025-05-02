@@ -148,6 +148,14 @@ const isoDatasets = [
     }));
   };
 
+  const toggleDatasetTwo = label => {
+    setLineChartDatatwo(prev => ({
+      ...prev,
+      datasets: prev.datasets.map(ds =>
+        ds.label === label ? { ...ds, hidden: !ds.hidden } : ds
+      ),
+    }));
+  };
   // Split datasets for custom legend
   const forecastSets = lineChartDataone.datasets.filter(ds => !ds.label.startsWith("Real-time "));
   const realtimeSets = lineChartDataone.datasets.filter(ds => ds.label.startsWith("Real-time "));
@@ -488,12 +496,44 @@ const isoDatasets = [
             </CardHeader>
             <CardBody>
               {lineChartDatatwo.labels.length ? (
-                <Line
-                  id="lineChart"
-                  data={lineChartDatatwo}
-                  options={predictiongraph.options}
-                  height="129px"
-                />
+         <>
+           <Line
+             id="lineChart"
+             data={lineChartDatatwo}
+             options={{
+               ...predictiongraph.options,
+               plugins: { legend: { display: false } }
+             }}
+             height="129px"
+           />
+           {/* custom bottom legend */}
+           <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap" }}>
+             {lineChartDatatwo.datasets.map(ds => (
+               <div
+                 key={ds.label}
+                 onClick={() => toggleDatasetTwo(ds.label)}
+                 style={{
+                   cursor: "pointer",
+                   display: "flex",
+                   alignItems: "center",
+                   marginRight: "1rem",
+                   opacity: ds.hidden ? 0.4 : 1
+                 }}
+               >
+                 <span
+                   style={{
+                     width: 12,
+                     height: 12,
+                     backgroundColor: ds.borderColor,
+                     marginRight: 4,
+                     display: "inline-block"
+                   }}
+                 />
+                 <span>{ds.label}</span>
+               </div>
+             ))}
+           </div>
+         </>
               ) : (
                 <p>Loading…</p>
               )}
