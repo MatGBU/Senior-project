@@ -10,7 +10,7 @@ from pathlib import Path
 # Assumes this script lives in the root of your cloned repo
 REPO_DIR   = Path(__file__).resolve().parent
 # Now read from the sibling Working_Models directory:
-INPUT_CSV  = REPO_DIR.parent / "Working_Models" / "realtime_iso.csv"
+INPUT_CSV  = REPO_DIR.parent / "realtime_iso.csv"
 OUTPUT_DIR  = Path("/var/www/html/data")
 OUTPUT_CSV  = OUTPUT_DIR / "realtime_iso.csv"
 GIT_BRANCH  = "main"
