@@ -43,6 +43,6 @@ if not filtered_df.empty:
     ]
 
     # Write to new CSV
-    output_df.to_csv("realtime_iso.csv", index=False)
+    output_df.to_csv("../realtime_iso.csv", index=False)
 else:
     pass
