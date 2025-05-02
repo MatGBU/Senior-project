@@ -47,49 +47,78 @@ function Dashboard() {
         const nuclearData = dataRows.map(r => +r[3] || 0);
         const windData    = dataRows.map(r => +r[4] || 0);
         const solarData   = dataRows.map(r => +r[5] || 0);
-        const otherData   = dataRows.map(r => (+r[6] || 0) + (+r[7] || 0));
+
 
         // Real-time ISO CSV
         const respISO = await fetch("/data/realtime_iso.csv");
         const textISO = await respISO.text();
         const rowsISO = textISO.trim().split("\n").map(r => r.split(","));
         const [hdrISO, ...bodyISO] = rowsISO;
-        const isoTechs = hdrISO.slice(1).filter(t => !/total_predicted/i.test(t));
+// 1) grab all techs except any “total” columns:
+const rawTechs = hdrISO.slice(1).filter(t => !/total_predicted/i.test(t));
 
-        // Build lookup map
-        const isoMap = {};
-        isoTechs.forEach(t => isoMap[t] = {});
-        bodyISO
-          .filter(r => r.length === hdrISO.length)
-          .forEach(r => {
-            const ts = r[0];
-            isoTechs.forEach(tech => {
-              const idx = hdrISO.indexOf(tech);
-              isoMap[tech][ts] = parseFloat(r[idx]) || 0;
-            });
-          });
+// 2) build lookup map for every tech:
+const isoMap = {};
+rawTechs.forEach(t => isoMap[t] = {});
+bodyISO
+  .filter(r => r.length === hdrISO.length)
+  .forEach(r => {
+    const ts = r[0];
+    rawTechs.forEach(tech => {
+      const idx = hdrISO.indexOf(tech);
+      isoMap[tech][ts] = parseFloat(r[idx]) || 0;
+    });
+  });
 
-        // Create ISO datasets
-        const isoDatasets = isoTechs.map(tech => {
-          const simpleName = tech.replace(/Predictions$/i, "");
-          return {
-            label: `Real-time ${simpleName}`,
-            data: labels.map(ts => isoMap[tech][ts] != null ? isoMap[tech][ts] : null),
-            fill: false,
-            tension: 0.4,
-            borderWidth: 2,
-            spanGaps: false,
-            borderDash: [5, 5],
-            borderColor:
-              simpleName === "Hydro"   ? "#6bd098" :
-              simpleName === "Nuclear" ? "#f17e5d" :
-              simpleName === "Wind"    ? "#fcc468" :
-              simpleName === "Solar"   ? "#1f8ef1" :
-              "#888888",
-            backgroundColor: "transparent",
-            hidden: !showAllISO,
-          };
-        });
+// 3) separate out the two you want to combine, and the rest:
+const combineKeys   = ["WoodPredictions", "RefusePredictions"];
+const singleTechs   = rawTechs.filter(t => !combineKeys.includes(t));
+
+// 4) build each standalone dataset:
+const singleDatasets = singleTechs.map(tech => {
+  const simple = tech.replace(/Predictions$/i, "");
+  return {
+    label: `Real-time ${simple}`,
+    data: labels.map(ts => isoMap[tech][ts] ?? null),
+    fill: false,
+    tension: 0.4,
+    borderWidth: 2,
+    spanGaps: false,
+    borderColor:
+      simple === "Hydro"   ? "#6bd098" :
+      simple === "Nuclear" ? "#f17e5d" :
+      simple === "Wind"    ? "#fcc468" :
+      simple === "Solar"   ? "#1f8ef1" :
+      "#888888",
+    backgroundColor: "transparent",
+    hidden: !showAllISO,
+  };
+});
+
+// 5) sum the two into “Other Renewables”:
+const otherData = labels.map(ts =>
+  combineKeys.reduce((sum, key) => sum + (isoMap[key]?.[ts] || 0), 0)
+);
+
+const combinedDataset = {
+  label: "Real-time Other Renewables",
+  data: otherData,
+  fill: false,
+  tension: 0.4,
+  borderWidth: 2,
+  spanGaps: false,
+  borderDash: [5, 5],
+  borderColor: "#9C27B0",
+  backgroundColor: "transparent",
+  hidden: !showAllISO,
+};
+
+// 6) merge into one array:
+const isoDatasets = [
+  ...singleDatasets,
+  combinedDataset,
+];
+
 
         setLineChartDataone({
           labels,
